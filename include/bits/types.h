@@ -94,7 +94,7 @@ typedef __quad_t *__qaddr_t;
 typedef long int __fsword_t;
 typedef long int __syscall_slong_t;
 typedef unsigned long int __syscall_ulong_t;
-typedef long int __intptr_t;
+typedef int __intptr_t;
 typedef long int __ssize_t;
 
 #elif defined __LP64

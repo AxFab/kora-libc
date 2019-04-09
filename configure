@@ -63,6 +63,7 @@ cat > Makefile << EOF
 topdir:=$TOPDIR
 gendir:=$GENDIR
 prefix:=$PREFIX
+target:=$TARGET
 CROSS:=$CROSS
 CC=:gcc
 include $TOPDIR/Makefile
