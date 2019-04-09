@@ -14,10 +14,12 @@
 # Repository files
 !.git*
 !*.md
+!configure
 
 # Building files
-!makefile
+!Makefile
 !*.mk
+!make/*.sh
 
 # Source files
 !*.h
