@@ -40,7 +40,7 @@ static int _sread(FILE *fp, char *buf, size_t length)
 
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
-#ifdef __SYS_CALL
+#ifndef __NO_SYSCALL
 /* Read and parse standard input */
 int scanf(const char *format, ...)
 {

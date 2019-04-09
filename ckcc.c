@@ -32,9 +32,8 @@ int main() {
 			printf("  WIERDO!");
 	}
 	printf("hostname max: %d\n", (int)sysconf(_SC_HOST_NAME_MAX));
-	printf("hostname max: %d\n", (int)sysconf(_SC_OPEN_MAX));
+	printf("open files max: %d\n", (int)sysconf(_SC_OPEN_MAX));
 	printf("login max: %d\n", (int)sysconf(_SC_LOGIN_NAME_MAX));
 	printf("freq: %d\n", (int)sysconf(_SC_CLK_TCK));
-	printf("phys page: %d\n", (int)sysconf(_SC_PHYS_PAGE));
 	return 0;
 }

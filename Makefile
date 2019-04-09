@@ -27,7 +27,8 @@ crt0: $(libdir)/crt0.o
 
 include $(topdir)/make/build.mk
 
-SRCS-y = $(wildcard $(srcdir)/c89/*.c)
+SRCS-y += $(wildcard $(srcdir)/c89/*.c)
+SRCS-y += $(srcdir)/$(target_os).c
 CFLAGS += -Wall -Wextra -I$(srcdir)/include -fPIC
 CFLAGS += -Wno-unused-parameter
 

@@ -2,6 +2,7 @@
 #define __STDC_LIBIO_H 1
 
 // #include <wchar.h>
+#include <stddef.h>
 #include <stdarg.h>
 #include <bits/io.h>
 

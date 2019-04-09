@@ -24,5 +24,7 @@
 # Source files
 !*.h
 !*.c
+!*.asm
+!*.[Ss]
 
 # Exceptions

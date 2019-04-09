@@ -82,7 +82,7 @@ static inline int _vsnprintf(char *str, size_t lg, const char *format,
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
-#ifdef __SYS_CALL
+#ifndef __NO_SYSCALL
 /* Write formated string on standard output */
 int printf(const char *format, ...)
 {
@@ -194,7 +194,8 @@ int _PRT(vsnprintf)(char *str, size_t lg, const char *format, va_list ap)
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
-#if 0 && defined __SYS_CALL
+#if 0 && !defined __NO_SYSCALL
+
 /* Write formated string from an allocated string */
 int vasprintf(char **s, const char *format, va_list ap)
 {
