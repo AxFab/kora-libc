@@ -11,4 +11,5 @@ $(libdir)/crt0.o: $(srcdir)/arch/i386/crt0.asm
 
 ASM_EXT := asm
 SRCS-y += $(wildcard $(srcdir)/arch/i386/libc/*.asm)
+SRCS-y += $(wildcard $(srcdir)/arch/i386/libc/*.c)
 
