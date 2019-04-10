@@ -50,6 +50,8 @@ CC := $(CROSS_COMPILE)gcc
 CXX := $(CROSS_COMPILE)g++
 LD := $(CROSS_COMPILE)ld
 NM := $(CROSS_COMPILE)nm
+INSTALL := install
+ASM_EXT := s
 
 DATE := $(shell date '+%Y-%m-%d')
 GIT_H := $(shell git --git-dir=$(topdir)/.git rev-parse --short HEAD 2> /dev/null)$(shell if [ -n "$(git --git-dir=$(topdir)/.git status -suno)"]; then echo '+'; fi)

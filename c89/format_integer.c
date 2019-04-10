@@ -23,9 +23,6 @@
 #include <errno.h>
 #include <kora/mcrs.h>
 
-#undef isspace
-
-
 typedef unsigned long long __ulong;
 
 #define LONG_MAX  2147483647L

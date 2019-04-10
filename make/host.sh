@@ -39,7 +39,8 @@ case "$arch" in
         vendor=pc
         ;;
     x86_64)
-        arch=x86_64
+    amd64)
+        arch=amd64
         vendor=pc
         ;;
     armv7l)

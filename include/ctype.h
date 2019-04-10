@@ -41,7 +41,7 @@ int isascii (int c);
 int toascii (int c);
 
 
-#define __CTYPE(n)  (c < 0 || c > 0x7F ? 0 : (*__ctype_b_loc())[c]);
+#define __CTYPE(c)  (c < 0 || c > 0x7F ? 0 : (*__ctype_b_loc())[(int)c])
 
 #define isalnum(c)  (_ISalnum & __CTYPE(c))
 #define isalpha(c)  (_ISalpha & __CTYPE(c))

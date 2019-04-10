@@ -338,10 +338,12 @@ int _PRT(vfprintf)(FILE *fp, const char *str, va_list ap)
 
         case 'p':
             sb.flag_ = ALT_FORM | ZERO_PAD;
+            lg -= 2;
+            _utoa(arg.i, tmp, 16, _utoa_digits);
+            break;
 
         case 'x':
         case 'X':
-
             if (sb.flag_ & ALT_FORM)
                 lg -= 2;
 
@@ -349,8 +351,6 @@ int _PRT(vfprintf)(FILE *fp, const char *str, va_list ap)
                 _utoa(arg.i, tmp, 16, _utoa_digits);
             else
                 _utoa(arg.i, tmp, 16, _utoa_digitsX);
-
-
             break;
 
         case 'o':

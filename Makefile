@@ -22,8 +22,10 @@ gendir ?= $(shell pwd)
 
 include $(topdir)/make/global.mk
 
-all: libc
+all: libc crt0
 crt0: $(libdir)/crt0.o
+install: $(prefix)/lib/libc.so $(prefix)/lib/crt0.o
+
 
 include $(topdir)/make/build.mk
 
@@ -32,9 +34,10 @@ SRCS-y += $(srcdir)/$(target_os).c
 CFLAGS += -Wall -Wextra -I$(srcdir)/include -fPIC
 CFLAGS += -Wno-unused-parameter
 
+include $(topdir)/arch/$(target_arch)/make.mk
+
 $(eval $(call link_shared,c,SRCS,LFLAGS))
 
-include $(topdir)/arch/$(target_arch)/make.mk
 
 ifeq ($(NODEPS),)
 include $(call fn_deps,SRCS)

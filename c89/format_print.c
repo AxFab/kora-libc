@@ -23,6 +23,7 @@
 #include <kora/mcrs.h>
 #include <bits/libio.h>
 
+int write(int, const char *, size_t);
 
 /* All of those methods are bind over vfprintf
  * which is implemented in another file.

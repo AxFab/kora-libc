@@ -18,7 +18,7 @@
 #  The configuration is on `sources.mk`.
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 define fn_objs
-	$(patsubst $(srcdir)/%.c,$(outdir)/%.o,$($(1)))
+	$(patsubst $(srcdir)/%.c,$(outdir)/%.o,$(patsubst $(srcdir)/%.$(ASM_EXT),$(outdir)/%.o,$($(1))))
 endef
 define fn_deps
 	$(patsubst $(srcdir)/%.c,$(outdir)/%.d,$($(1)))
@@ -44,8 +44,15 @@ endef
 
 clean:
 	$(V) rm -rf $(outdir)
-distclean: clean
 	$(V) rm -rf $(libdir)
 	$(V) rm -rf $(bindir)
+
+$(prefix)/lib/%: $(libdir)/%
+	$(S) mkdir -p $(dir $@)
+	$(V) $(INSTALL) $< $@
+
+$(prefix)/bin/%: $(bindir)/%
+	$(S) mkdir -p $(dir $@)
+	$(V) $(INSTALL) $< $@
 
 .PHONY: clean distclean

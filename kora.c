@@ -28,6 +28,9 @@
 
 #define MMAP_HEAP 5
 
+FILE *fvopen(int fd, int o);
+void setup_allocator(void *, size_t);
+
 _Noreturn void exit(int status)
 {
     for (;;)
@@ -126,7 +129,12 @@ void __perror_fail(int err, const char *file, int line, const char *msg)
     exit(-1);
 }
 
-_Noreturn void __assert_fail(const char *expr, const char *file, int line)
+_Noreturn void __assert_fail(const char *expr, const char *file, int line, const char *func)
+{
+    for (;;);
+}
+
+_Noreturn void __assert(const char *assertion, const char *file, int line)
 {
     for (;;);
 }
