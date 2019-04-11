@@ -35,11 +35,23 @@ $(outdir)/%.d: $(srcdir)/%.c
 	$(V) $(CC) -M -o $@ $< $(CFLAGS)
 
 define link_shared
+LIBS += lib$(1)
 lib$(1): $(libdir)/lib$(1).so
+install-lib$(1): $(prefix)/lib/lib$(1).so
 $(libdir)/lib$(1).so: $(call fn_objs,$(2)-y)
 	$(S) mkdir -p $$(dir $$@)
 	$(Q) echo "    LD  $$@"
 	$(V) $(LD) -shared -o $$@ $$^ $($(3))
+endef
+
+define link_bin
+BINS += $(1)
+$(1): $(bindir)/$(1)
+install-$(1): $(prefix)/bin/$(1)
+$(bindir)/$(1): $(call fn_objs,$(2)-y)
+	$(S) mkdir -p $$(dir $$@)
+	$(Q) echo "   LD  $$@"
+	$(V) $(CC) -o $$@ $$^ $($(3))
 endef
 
 clean:
@@ -55,4 +67,7 @@ $(prefix)/bin/%: $(bindir)/%
 	$(S) mkdir -p $(dir $@)
 	$(V) $(INSTALL) $< $@
 
-.PHONY: clean distclean
+
+.PHONY: clean
+
+

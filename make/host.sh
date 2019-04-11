@@ -38,8 +38,7 @@ case "$arch" in
         arch=i386
         vendor=pc
         ;;
-    x86_64)
-    amd64)
+    x86_64|amd64)
         arch=amd64
         vendor=pc
         ;;

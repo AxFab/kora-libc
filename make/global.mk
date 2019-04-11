@@ -28,7 +28,7 @@ bindir := $(gendir)/bin
 libdir := $(gendir)/lib
 
 # T A R G E T -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-host ?= $(shell uname -m)-pc-linux-gnu
+host ?= $(shell $(topdir)/make/host.sh)
 host_arch := $(word 1,$(subst -, ,$(host)))
 host_vendor := $(word 2,$(subst -, ,$(host)))
 host_os := $(patsubst $(host_arch)-$(host_vendor)-%,%,$(host))

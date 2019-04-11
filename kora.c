@@ -150,3 +150,14 @@ void __libc_init()
     stdout = fvopen(1, O_WRONLY);
     stderr = fvopen(2, O_WRONLY);
 }
+
+void opendir() {
+}
+void readdir() {
+}
+void closedir() {
+}
+
+void stat() {
+}
+
