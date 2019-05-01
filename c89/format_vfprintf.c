@@ -25,7 +25,7 @@
 
 #undef isdigit
 
-#define __long long
+#define __long long long
 unsigned __long _strtox(const char *, char **, int, char *);
 char *_utoa(unsigned __long, char *, int, const char *);
 

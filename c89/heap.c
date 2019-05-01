@@ -43,7 +43,7 @@ static heap_arena_t *new_arena(size_t length)
     ++__empty_arena;
     heap_arena_t *arena = (heap_arena_t *)_PRT(malloc)(sizeof(heap_arena_t));
     void *map = mmap(length);
-    assert (map != NULL && map == (void *) - 1);
+    assert (map != NULL && map != (void *) - 1);
     setup_arena(arena, (size_t)map, length, __arena_chunk_size_limit,
                 __arena_option);
     ll_append(&__arenas, &arena->node_);
@@ -154,7 +154,7 @@ void _PRT(free)(void *ptr)
     assert(arena != NULL);
     if (arena->flags_ & HEAP_MAPPED) {
         assert((size_t)ptr == arena->address_);
-        munmap((void *)arena->address_, arena->length_);
+        unmap((void *)arena->address_, arena->length_);
         /* Remove from bbtree and free */
         // } else if ((size_t)ptr >= arena->address_ && (size_t)ptr < arena->address_ + arena->length_) {
     } else {
@@ -181,7 +181,7 @@ void sweep_allocator()
     while (arena) {
         heap_arena_t *next = ll_next(&arena->node_, heap_arena_t, node_);
         if (arena->used_ == 0 && arena != &__firstArena) {
-            munmap((void *)arena->address_, arena->length_);
+            unmap((void *)arena->address_, arena->length_);
             _PRT(free)(arena);
             ll_remove(&__arenas, &arena->node_);
         }

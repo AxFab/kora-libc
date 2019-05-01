@@ -26,4 +26,5 @@ int *__errno_location();
 #undef errno
 #define errno  (*__errno_location())
 
+
 #endif /* __ERRNO_H */

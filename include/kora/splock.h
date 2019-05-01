@@ -23,6 +23,9 @@
 #include <stdatomic.h>
 #include <stdbool.h>
 
+#define atomic_inc(v)  (++(*(v)))
+#define atomic_dec(v)  (--(*(v)))
+
 #if defined KORA_KRN || defined UM_KRN
 extern void irq_reset(bool enable);
 extern bool irq_enable();
