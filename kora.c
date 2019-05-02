@@ -22,11 +22,10 @@
 #include <kora/splock.h>
 #include <kora/mcrs.h>
 #include <kora/syscalls.h>
-// #include <_stdCkora/allocator.h>
 // #include <sys/mman.h>
 #include <errno.h>
 
-#define MMAP_HEAP 5
+#define MMAP_HEAP 0x100
 
 FILE *fvopen(int fd, int o);
 void setup_allocator(void *, size_t);

@@ -32,7 +32,7 @@ include $(topdir)/make/build.mk
 SRCS-y += $(wildcard $(srcdir)/c89/*.c)
 SRCS-y += $(srcdir)/$(target_os).c
 CFLAGS += -Wall -Wextra -I$(srcdir)/include -fPIC
-CFLAGS += -Wno-unused-parameter
+CFLAGS += -Wno-unused-parameter -ggdb
 
 include $(topdir)/arch/$(target_arch)/make.mk
 
