@@ -30,7 +30,7 @@
 extern void irq_reset(bool enable);
 extern bool irq_enable();
 extern void irq_disable();
-#define RELAX ((void)0)
+#define RELAX asm("pause")
 #define THROW_ON irq_enable()
 #define THROW_OFF irq_disable()
 #else

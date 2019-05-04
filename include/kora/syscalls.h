@@ -50,6 +50,9 @@
 #define SYS_WINDOW  18
 #define SYS_PIPE  19
 
+#define SYS_START 31
+#define SYS_STOP 32
+
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
 

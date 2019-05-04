@@ -19,146 +19,105 @@
  */
 #include <threads.h>
 #include <kora/splock.h>
-#include <kora/std.h>
-#include <kora/futex.h>
+#include <stdlib.h>
+#include <stdint.h>
 #include <time.h>
 #include <errno.h>
 #include <limits.h>
 
 
-/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
-
-/* Creates a mutex */
-int mtx_init(mtx_t *mutex, int flags)
+int mtx_init(mtx_t *mtx, int type)
 {
-    // TODO - Use shm in case of mtx_shared
-    struct _US_MUTEX *ptr = malloc(sizeof(struct _US_MUTEX));
-    ptr->counter = 0;
-    ptr->flags = flags;
-    ptr->thread = 0;
-    splock_init(&ptr->splock);
-    *mutex = ptr;
-    return 0;
+    mtx->val = 0;
+    mtx->tid = 0;
+    mtx->flg = type;
+    mtx->cnt = 0;
+    return thrd_success;
 }
 
-/* Blocks locks a mutex */
-int mtx_lock(mtx_t *mutex)
+void mtx_destroy(mtx_t *mtx)
 {
-    struct timespec ts;
-    ts.tv_sec = LONG_MAX;
-    return mtx_timedlock(mutex, &ts);
 }
 
-/* Blocks until locks a mutex or times out */
-int mtx_timedlock(mtx_t *mutex, const struct timespec *until)
+int mtx_timedlock(mtx_t *mtx, const xtime *xt)
 {
-    struct _US_MUTEX *ptr = *mutex;
-    if (ptr->counter > 0 && (ptr->flags & mtx_recursive) && thrd_equal(ptr->thread, thrd_current()))
-        return 0;
+#if 0
+    thrd_t tid = thrd_current();
+    if (mtx->tid == tid) {
+        if (!(mtx->flg & mtx_recursive))
+            __pfails("Deadlock");
+        ++mtx->cnt;
+        return thrd_success;
+    }
+#endif
 
-    if (atomic_xadd(&ptr->counter, 1) == 0) {
-        ptr->thread = thrd_current();
-        return 0;
+    int old = 0;
+    if (atomic_compare_exchange_strong(&mtx->val, &old, 1)) {
+        // Le futex était libre car il contenait la valeur 0
+        // et maintenant il contient la valeur 1
+        mtx->cnt = 0;
+#if 0
+        mtx->tid = tid;
+#endif
+        return thrd_success;
     }
 
-    if (futex_wait(ptr, until) == 0) {
-        ptr->thread = thrd_current();
-        return 0;
+    old = atomic_exchange(&mtx->val, 2);
+    while (old != 0) {
+        // Le mutex contient la valeur 1 : l’autre thread l’a pris
+        // ==> Attente tant que le futex a la valeur 1
+        futex_wait(&mtx->val, 2); // TODO -- timeout
+        old = atomic_exchange(&mtx->val, 2);
     }
-    return -1;
+    mtx->cnt = 0;
+#if 0
+    mtx->tid = tid;
+#endif
+    return thrd_success;
 }
 
-/* Locks a mutex or returns without blocking if already locked */
-int mtx_trylock(mtx_t *mutex)
+int mtx_lock(mtx_t *mtx)
 {
-    struct _US_MUTEX *ptr = *mutex;
-    if (ptr->counter > 0 && (ptr->flags & mtx_recursive) && thrd_equal(ptr->thread, thrd_current()))
-        return 0;
+    static const xtime xt = { INT_MAX, LONG_MAX };
+    return mtx_timedlock(mtx, &xt);
+}
 
-    if (atomic_cmpxchg(&ptr->counter, 0, 1) == 0) {
-        ptr->thread = thrd_current();
-        return 0;
+int mtx_trylock(mtx_t *mtx)
+{
+#if 0
+    thrd_t tid = thrd_current();
+    if (mtx->tid == tid) {
+        if (!(mtx->flg & mtx_recursive))
+            __pfails("Deadlock");
+        ++mtx->cnt;
+        return thrd_success;
     }
+#endif
+    int old = 0;
 
-    return 1;
+    if (!atomic_compare_exchange_strong(&mtx->val, &old, 1))
+        return thrd_busy;
+    // Le futex était libre car il contenait la valeur 0
+    // et maintenant il contient la valeur 1
+    mtx->cnt = 0;
+#if 0
+    mtx->tid = tid;
+#endif
+    return thrd_success;
 }
 
-/* Unlocks a mutex */
-int mtx_unlock(mtx_t *mutex)
+int mtx_unlock(mtx_t *mtx)
 {
-    struct _US_MUTEX *ptr = *mutex;
-    int prev = atomic_xchg(&ptr->counter, 0);
-    if (prev > 1)
-        futex_raise(ptr);
-    return 0;
+    if (mtx->cnt > 0) {
+        --mtx->cnt;
+        return thrd_success;
+    }
+    mtx->tid = 0;
+    int old = atomic_fetch_sub(&mtx->val, 1);
+    if (old == 1)
+        return thrd_success;
+    old = atomic_exchange(&mtx->val, 0);
+    futex_wakeup(&mtx->val, 1);
+    return thrd_success;
 }
 
-/* Destroys a mutex */
-void mtx_destroy(mtx_t *mutex)
-{
-    struct _US_MUTEX *ptr = *mutex;
-    free(ptr);
-}
-
-/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
-
-
-/* Creates a condition variable */
-int cnd_init(cnd_t *cond)
-{
-    mtx_init(cond, mtx_timed);
-    mtx_lock(cond);
-    return 0;
-}
-
-/* Unblocks one thread blocked on a condition variable */
-int cnd_signal(cnd_t *cond)
-{
-    struct _US_MUTEX *ptr = *cond;
-    ptr->flags |= mtx_cnd_single;
-    return mtx_unlock(cond);
-}
-
-/* Unblocks all threads blocked on a condition variable */
-int cnd_broadcast(cnd_t *cond)
-{
-    struct _US_MUTEX *ptr = *cond;
-    ptr->flags &= ~mtx_cnd_single;
-    return mtx_unlock(cond);
-}
-
-/* Blocks on a condition variable */
-int cnd_wait(cnd_t *cond, mtx_t *mutex)
-{
-    struct _US_MUTEX *ptr = *cond;
-    if (mutex != NULL)
-        mtx_unlock(mutex);
-    if (mtx_lock(cond) != 0)
-        return -1;
-    if ((ptr->flags & mtx_cnd_single) == 0)
-        mtx_unlock(cond);
-    if (mutex != NULL)
-        return mtx_lock(mutex);
-    return 0;
-}
-
-/* Blocks on a condition variable, with a timeout */
-int cnd_timedwait(cnd_t *cond, mtx_t *mutex, const struct timespec *until)
-{
-    struct _US_MUTEX *ptr = *cond;
-    if (mutex != NULL)
-        mtx_unlock(mutex);
-    if (mtx_timedlock(cond, until) != 0)
-        return -1;
-    if ((ptr->flags & mtx_cnd_single) == 0)
-        mtx_unlock(cond);
-    if (mutex != NULL)
-        return mtx_timedlock(mutex, until);
-    return 0;
-}
-
-/* Destroys a condition variable */
-void cnd_destroy(cnd_t *cond)
-{
-    mtx_destroy(cond);
-}

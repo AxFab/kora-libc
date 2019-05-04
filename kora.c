@@ -41,6 +41,44 @@ int fork()
     return -1;
 }
 
+int futex_wait(int *addr, int val)
+{
+
+} // TODO -- timeout
+
+int futex_wakeup(int *addr, int val)
+{
+
+}
+
+void chdir() {}
+void getcwd() {}
+
+void thrd_create() {}
+
+int __exec(char *name, int argc, char **argv, int fds[3])
+{
+    int i;
+    char cmdline[4096];
+
+    strncpy(cmdline, name, 4096);
+    for (i = 0; i < argc; ++i) {
+        strncat(cmdline, " ", 4096);
+        strncat(cmdline, argv[i], 4096);
+    }
+
+    int pid = fork();
+    if (pid != 0)
+        return pid;
+
+    exit(-1);
+}
+
+int window(int service, int width, int height, int flags)
+{
+    return syscall(SYS_WINDOW, service, width, height, flags);
+}
+
 // int execve(char *name, char **argv, char **env);
 // int getpid();
 // int wait(int *status);
@@ -125,17 +163,26 @@ int *__errno_location()
 
 void __perror_fail(int err, const char *file, int line, const char *msg)
 {
+    char buf[4096];
+    int lg = snprintf(buf, 4096, "Proc error %d at %s:%d : %s\n", err, file, line, msg);
+    write(2, buf, lg);
     exit(-1);
 }
 
 _Noreturn void __assert_fail(const char *expr, const char *file, int line, const char *func)
 {
-    for (;;);
+    char buf[4096];
+    int lg = snprintf(buf, 4096, "Assertion %s at %s:%d in %s\n", expr, file, line, func);
+    write(2, buf, lg);
+    exit(-1);
 }
 
-_Noreturn void __assert(const char *assertion, const char *file, int line)
+_Noreturn void __assert(const char *expr, const char *file, int line)
 {
-    for (;;);
+    char buf[4096];
+    int lg = snprintf(buf, 4096, "Assertion %s at %s:%d\n", expr, file, line);
+    write(2, buf, lg);
+    exit(-1);
 }
 
 void __libc_init()

@@ -37,7 +37,7 @@ typedef unsigned long int uint_fast16_t;
 typedef unsigned long int uint_fast32_t;
 typedef unsigned long int uint_fast64_t;
 
-typedef long int intptr_t;
+typedef __intptr_t intptr_t;
 typedef unsigned long int uintptr_t;
 typedef long int intmax_t;
 typedef unsigned long int uintmax_t;
