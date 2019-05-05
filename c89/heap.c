@@ -25,7 +25,7 @@
 #else
 void *mmap(void*,size_t, int, int, int, int);
 void munmap(void*,size_t);
-#define mmap(s) mmap(NULL, s, 6, 0, 0, 0);
+#define mmap(s) mmap(NULL, s, 6, 0x100, -1, 0);
 #define unmap(a,s) munmap((void*)a, s);
 #endif
 
