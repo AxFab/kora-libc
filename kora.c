@@ -131,7 +131,9 @@ int lseek(int fd, __off_t offset, unsigned int origin)
 
 int fcntl(int fd, int cmd, ...)
 {
-    return -1;
+    void *args = ((size_t*)&cmd) + 1;
+    return syscall(SYS_FCNTL, fd, cmd, args);
+    // return -1;
 }
 
 // int fstat(int file, struct stat *st);
