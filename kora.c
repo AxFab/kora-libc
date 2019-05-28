@@ -23,6 +23,7 @@
 #include <kora/mcrs.h>
 #include <kora/syscalls.h>
 // #include <sys/mman.h>
+#include <string.h>
 #include <errno.h>
 
 #define MMAP_HEAP 0x100
@@ -41,20 +42,43 @@ int fork()
     return -1;
 }
 
-int futex_wait(int *addr, int val)
+long long clock_read(int no)
 {
-
-} // TODO -- timeout
-
-int futex_wakeup(int *addr, int val)
-{
-
+    return -1;
 }
 
-void chdir() {}
-void getcwd() {}
+int futex_wait(int *addr, int val, long timeout, int flags)
+{
+    return syscall(SYS_FUTEX_WAKE, addr, val, timeout, flags);
+}
 
-void thrd_create() {}
+int futex_requeue(int *addr, int val, int val2, int *addr2, int flags)
+{
+    return syscall(SYS_FUTEX_REQUEUE, addr, val, val2, addr2, flags);
+}
+
+int futex_wake(int *addr, int val)
+{
+    return syscall(SYS_FUTEX_REQUEUE, addr, val, 0, NULL, 0);
+}
+
+
+
+int chdir(const char *path)
+{
+    int len = strlen(path) + 1;
+    return syscall(SYS_SINFO, 80/*SNFO_PWD*/, path, len);
+}
+
+char *getcwd(char *buf, size_t len)
+{
+    int ret = syscall(SYS_GINFO, 80/*SNFO_PWD*/, buf, len);
+    return ret == 0 ? buf : NULL;
+}
+
+void thrd_create()
+{
+}
 
 int __exec(char *name, int argc, char **argv, int fds[3])
 {
