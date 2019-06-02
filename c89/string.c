@@ -98,6 +98,19 @@ void *memchr(const void *str, int c, size_t len)
     return (void *)(len ? ptr0 : 0);
 }
 
+/* Searches the first len bytes of array str for character c. */
+void *memrchr(const void *str, int c, size_t len)
+{
+    register const char *ptr0 = ((const char *)str) + len;
+
+    while (len > 0 && (*ptr0 != (char)c)) {
+        --ptr0;
+        --len;
+    }
+
+    return (void *)(len ? ptr0 : 0);
+}
+
 /* Compares two blocks of signed chars. */
 int memcmp(const void *s1, const void *s2, size_t len)
 {

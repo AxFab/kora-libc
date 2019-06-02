@@ -232,4 +232,12 @@ void closedir() {
 
 void stat() {
 }
+void lstat() {
+}
+void readlink() {
+}
+void localtime_r() {
+}
+void strftime() {
+}
 
