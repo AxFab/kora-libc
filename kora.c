@@ -67,12 +67,12 @@ int futex_wake(int *addr, int val)
 int chdir(const char *path)
 {
     int len = strlen(path) + 1;
-    return syscall(SYS_SINFO, 80/*SNFO_PWD*/, path, len);
+    return syscall(SYS_SINFO, 12/*SNFO_PWD*/, path, len);
 }
 
 char *getcwd(char *buf, size_t len)
 {
-    int ret = syscall(SYS_GINFO, 80/*SNFO_PWD*/, buf, len);
+    int ret = syscall(SYS_GINFO, 12/*SNFO_PWD*/, buf, len);
     return ret == 0 ? buf : NULL;
 }
 
