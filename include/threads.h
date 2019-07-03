@@ -15,8 +15,8 @@ static inline void cpu_barrier()
 {
 }
 
-typedef int(*thrd_start_t)(void*);
-typedef void(*tss_dtor_t)(void*);
+typedef int(*thrd_start_t)(void *);
+typedef void(*tss_dtor_t)(void *);
 
 typedef struct mtx mtx_t;
 typedef struct cnd cnd_t;

@@ -6,8 +6,7 @@
 #include <bits/stat.h>
 // kernel flags
 
-struct flock
-{
+struct flock {
     short int l_type;
     short int l_whence;
     __off_t l_start;
@@ -20,8 +19,7 @@ typedef __off_t off_t;
 typedef __pid_t pid_t;
 
 // # 120 "/usr/include/time.h" 3 4
-struct timespec
-{
+struct timespec {
     __time_t tv_sec;
     __syscall_slong_t tv_nsec;
 };

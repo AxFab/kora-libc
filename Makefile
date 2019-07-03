@@ -26,12 +26,13 @@ all: libc crt0
 crt0: $(libdir)/crt0.o
 install: $(prefix)/lib/libc.so $(prefix)/lib/crt0.o
 
+DISTO ?= kora
 
 include $(topdir)/make/build.mk
 
 SRCS-y += $(wildcard $(srcdir)/c89/*.c)
 SRCS-y += $(wildcard $(srcdir)/c11/*.c)
-SRCS-y += $(srcdir)/$(target_os).c
+SRCS-y += $(wildcard $(srcdir)/$(DISTO)/*.c)
 CFLAGS += -Wall -Wextra -I$(srcdir)/include -fPIC
 CFLAGS += -Wno-unused-parameter -ggdb
 

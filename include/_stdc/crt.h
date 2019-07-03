@@ -4,7 +4,7 @@
 #include <stddef.h>
 
 void *malloc(size_t len);
-void free(void* ptr);
+void free(void *ptr);
 
 int read(int fd, char *buf, size_t len);
 int write(int fd, const char *buf, size_t len);

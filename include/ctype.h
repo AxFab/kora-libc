@@ -23,9 +23,9 @@ enum {
     _ISalnum = 0x800,
 };
 
-const unsigned short int **__ctype_b_loc (void);
-const __int32_t **__ctype_tolower_loc (void);
-const __int32_t **__ctype_toupper_loc (void);
+const unsigned short int **__ctype_b_loc(void);
+const __int32_t **__ctype_tolower_loc(void);
+const __int32_t **__ctype_toupper_loc(void);
 
 
 #define CTYPE(n)  int n(int c);
@@ -34,11 +34,11 @@ const __int32_t **__ctype_toupper_loc (void);
 
 #include <_stdc/ctype.h>
 
-int tolower (int c);
-int toupper (int c);
+int tolower(int c);
+int toupper(int c);
 
-int isascii (int c);
-int toascii (int c);
+int isascii(int c);
+int toascii(int c);
 
 
 #define __CTYPE(c)  (c < 0 || c > 0x7F ? 0 : (*__ctype_b_loc())[(int)c])

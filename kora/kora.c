@@ -76,10 +76,6 @@ char *getcwd(char *buf, size_t len)
     return ret == 0 ? buf : NULL;
 }
 
-void thrd_create()
-{
-}
-
 int __exec(char *name, int argc, char **argv, int fds[3])
 {
     int i;
@@ -96,11 +92,6 @@ int __exec(char *name, int argc, char **argv, int fds[3])
         return pid;
 
     exit(-1);
-}
-
-int window(int service, int width, int height, int flags)
-{
-    return syscall(SYS_WINDOW, service, width, height, flags);
 }
 
 // int execve(char *name, char **argv, char **env);
@@ -120,50 +111,6 @@ int munmap(void *addr, size_t length)
 {
     return syscall(SYS_MUNMAP, addr, length);
 }
-
-/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
-
-
-int open(const char *path, int flags, ...)
-{
-    va_list ap;
-    va_start(ap, flags);
-    int mode = va_arg(ap, int);
-    va_end(ap);
-    return syscall(SYS_OPEN, -1, path, flags, mode);
-}
-
-int close(int fd)
-{
-    return syscall(SYS_CLOSE, fd);
-}
-
-int read(int fd, void *buf, size_t lg)
-{
-    return syscall(SYS_READ, fd, buf, lg);
-}
-
-int write(int fd, const void *buf, size_t lg)
-{
-    return syscall(SYS_WRITE, fd, buf, lg);
-}
-
-int lseek(int fd, __off_t offset, unsigned int origin)
-{
-    return -1;
-}
-
-int fcntl(int fd, int cmd, ...)
-{
-    void *args = ((size_t*)&cmd) + 1;
-    return syscall(SYS_FCNTL, fd, cmd, args);
-    // return -1;
-}
-
-// int fstat(int file, struct stat *st);
-// int stat(const char *file, struct stat *st);
-// int link(char *old, char *new);
-// int unlink(char *name);
 
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
@@ -223,21 +170,33 @@ void __libc_init()
     stderr = fvopen(2, O_WRONLY);
 }
 
-void opendir() {
+void opendir()
+{
 }
-void readdir() {
+void readdir()
+{
 }
-void closedir() {
+void closedir()
+{
 }
 
-void stat() {
+void usleep()
+{
 }
-void lstat() {
+
+void stat()
+{
 }
-void readlink() {
+void lstat()
+{
 }
-void localtime_r() {
+void readlink()
+{
 }
-void strftime() {
+void localtime_r()
+{
+}
+void strftime()
+{
 }
 

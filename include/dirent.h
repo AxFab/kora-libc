@@ -25,8 +25,7 @@
 #include <bits/posix1_lim.h>
 #include <stddef.h>
 
-struct dirent
-{
+struct dirent {
     __ino_t d_ino;
     __off_t d_off;
 
@@ -51,27 +50,27 @@ enum {
 typedef struct __dirstream DIR;
 
 
-DIR *opendir (const char *name);
-int closedir (DIR *dirp);
+DIR *opendir(const char *name);
+int closedir(DIR *dirp);
 
-DIR *fdopendir (int fd);
-int dirfd (DIR *dirp);
+DIR *fdopendir(int fd);
+int dirfd(DIR *dirp);
 
-struct dirent *readdir (DIR *dirp);
-int readdir_r (DIR *restrict dirp, struct dirent *restrict entry,
-    struct dirent **restrict result);
-
-
-void rewinddir (DIR *dirp);
-void seekdir (DIR *dirp, long int pos);
-long int telldir (DIR *dirp);
+struct dirent *readdir(DIR *dirp);
+int readdir_r(DIR *restrict dirp, struct dirent *restrict entry,
+              struct dirent **restrict result);
 
 
-int scandir (const char *restrict dir, struct dirent ***restrict namelist,
-    int (*selector) (const struct dirent *),
-    int (*cmp) (const struct dirent **, const struct dirent **));
-int alphasort (const struct dirent **e1, const struct dirent **e2);
-__ssize_t getdirentries (int fd, char *restrict buf, size_t nbytes,
-    __off_t *restrict basep);
+void rewinddir(DIR *dirp);
+void seekdir(DIR *dirp, long int pos);
+long int telldir(DIR *dirp);
+
+
+int scandir(const char *restrict dir, struct dirent ***restrict namelist,
+            int (*selector)(const struct dirent *),
+            int (*cmp)(const struct dirent **, const struct dirent **));
+int alphasort(const struct dirent **e1, const struct dirent **e2);
+__ssize_t getdirentries(int fd, char *restrict buf, size_t nbytes,
+                        __off_t *restrict basep);
 
 #endif  /* __DIRENT_H */

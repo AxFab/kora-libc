@@ -5,8 +5,7 @@
 // #include <bits/ioctl.h>
 // kernel ioctl
 
-struct winsize
-{
+struct winsize {
     unsigned short int ws_row;
     unsigned short int ws_col;
     unsigned short int ws_xpixel;
@@ -14,8 +13,7 @@ struct winsize
 };
 
 
-struct termio
-{
+struct termio {
     unsigned short int c_iflag;
     unsigned short int c_oflag;
     unsigned short int c_cflag;

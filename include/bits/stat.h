@@ -3,8 +3,7 @@
 
 #include <bits/types.h>
 
-struct stat
-{
+struct stat {
     __dev_t st_dev;
     __ino_t st_ino;
     __nlink_t st_nlink;

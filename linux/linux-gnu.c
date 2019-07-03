@@ -47,7 +47,7 @@ int fork()
 
 void *mmap(void *addr, size_t length, int prot, int flags, int fd, __off_t off)
 {
-    return (void *)-1;
+    return (void *) - 1;
 }
 
 int munmap(void *addr, size_t length)
