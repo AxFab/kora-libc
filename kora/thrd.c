@@ -27,15 +27,42 @@
 #include <errno.h>
 
 
+void usleep(__useconds_t usec)
+{
+    syscall(SYS_SLEEP, usec);
+}
+
+int __exec(char *name, const char **argv, const char **env, int fds[3])
+{
+    return syscall(SYS_PFORK, 0, name, argv, env, fds);
+}
+
+_Noreturn void exit(int res)
+{
+    for (;;)
+        syscall(SYS_EXIT, res, 0);
+}
+
+int fork()
+{
+    return -1;
+}
+
+static void thrd_run_impl_(thrd_start_t func, void *arg)
+{
+    int res = func(arg);
+    if (res == 0)
+        thrd_detach(thrd_current());
+    thrd_exit(res);
+}
+
 int thrd_create(thrd_t *thr, thrd_start_t func, void *arg)
 {
-    // void *stack = mmap();
-    // thr = stack;
-    // stack[0] = desc
-    // stack[1] = func
-    // stack[2] = arg
-    // SYS_FORK(Nothing, &stack[3], thrd_run_impl_);
-    return thrd_error;
+    void *params[2];   // void *stack = mmap();
+    params[0] = func;
+    params[1] = arg;
+    long ret = syscall(SYS_TFORK, 0, &thrd_run_impl_, &params, 2, NULL);
+    return ret == 0 ? thrd_error : thrd_success;
 }
 
 thrd_t thrd_current(void)
@@ -55,7 +82,8 @@ int thrd_equal(thrd_t thr0, thrd_t thr1)
 
 void thrd_exit(int res)
 {
-    // SYS_EXIT(res, THREAD);
+    for (;;)
+        syscall(SYS_EXIT, res, -1);
 }
 
 int thrd_join(thrd_t thr, int *res)
@@ -66,10 +94,11 @@ int thrd_join(thrd_t thr, int *res)
 
 void thrd_sleep(const struct timespec *restrict time_point)
 {
-    // SYS_SLEEP(timeout)
+    usleep(time_point->tv_sec * 1000000LL + time_point->tv_nsec / 1000LL);
 }
 
 void thrd_yield(void)
 {
-    // SYS_SLEEP(-1)
+    syscall(SYS_SLEEP, -1);
 }
+

@@ -28,19 +28,12 @@
 
 #define MMAP_HEAP 0x100
 
+_Noreturn void exit(int res);
 FILE *fvopen(int fd, int o);
 void setup_allocator(void *, size_t);
+int snprintf(char *buf, size_t len, const char *msg, ...);
+int write(int fd, char *buf, size_t len);
 
-_Noreturn void exit(int status)
-{
-    for (;;)
-        syscall(SYS_EXIT, status);
-}
-
-int fork()
-{
-    return -1;
-}
 
 long long clock_read(int no)
 {
@@ -49,7 +42,7 @@ long long clock_read(int no)
 
 int futex_wait(int *addr, int val, long timeout, int flags)
 {
-    return syscall(SYS_FUTEX_WAKE, addr, val, timeout, flags);
+    return syscall(SYS_FUTEX_WAIT, addr, val, timeout, flags);
 }
 
 int futex_requeue(int *addr, int val, int val2, int *addr2, int flags)
@@ -74,24 +67,6 @@ char *getcwd(char *buf, size_t len)
 {
     int ret = syscall(SYS_GINFO, 12/*SNFO_PWD*/, buf, len);
     return ret == 0 ? buf : NULL;
-}
-
-int __exec(char *name, int argc, char **argv, int fds[3])
-{
-    int i;
-    char cmdline[4096];
-
-    strncpy(cmdline, name, 4096);
-    for (i = 0; i < argc; ++i) {
-        strncat(cmdline, " ", 4096);
-        strncat(cmdline, argv[i], 4096);
-    }
-
-    int pid = fork();
-    if (pid != 0)
-        return pid;
-
-    exit(-1);
 }
 
 // int execve(char *name, char **argv, char **env);
@@ -180,9 +155,6 @@ void closedir()
 {
 }
 
-void usleep()
-{
-}
 
 void stat()
 {

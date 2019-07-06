@@ -42,6 +42,7 @@
 #define SYS_MUNMAP  4
 #define SYS_MPROTECT  5
 
+#define SYS_ACCESS 33
 #define SYS_OPEN  6
 #define SYS_CLOSE  7
 #define SYS_READ  8
@@ -52,19 +53,24 @@
 #define SYS_PIPE  19
 #define SYS_FCNTL  20
 
-#define SYS_FUTEX_WAKE 22
+#define SYS_FUTEX_WAIT 22
 #define SYS_FUTEX_REQUEUE 23
+
 
 #define SYS_START 31
 #define SYS_STOP 32
 
+#define SYS_SLEEP 30
+#define SYS_SFORK 27
+#define SYS_PFORK 28
+#define SYS_TFORK 29
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
 
-struct iovec {
-    char *buffer;
-    size_t length;
-};
+//struct iovec {
+//    char *buffer;
+//    size_t length;
+//};
 
 struct image {
     int width, height, pitch, format;
@@ -100,8 +106,7 @@ struct image {
 // int sys_write(int fd, const struct iovec *iovec, unsigned long count);
 // int sys_seek(int fd, off_t off, unsigned long whence);
 // /* - */
-// int sys_window(void *img, int fd, void *info, unsigned long features,
-//                unsigned long events);
+// int sys_window(int ctx, int width, int height, unsigned flags);
 // int sys_pipe(int *fds);
 
 
