@@ -58,6 +58,7 @@ const __int32_t __ascii_upper[] = {
     0x58, 0x59, 0x5A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F,
 };
 
+
 const unsigned short int **__ctype_b_loc(void)
 {
     return (const unsigned short **)(&__ascii_b);
@@ -71,6 +72,28 @@ const __int32_t **__ctype_tolower_loc(void)
 const __int32_t **__ctype_toupper_loc(void)
 {
     return (const __int32_t **)(&__ascii_upper);
+}
+
+
+unsigned short int __ctype_b(int chr)
+{
+    if (chr < 0 || chr > 0x7f)
+        return 0;
+    return __ascii_b[chr];
+}
+
+__int32_t __ctype_tolower(int chr)
+{
+    if (chr < 0 || chr > 0x7f)
+        return 0;
+    return __ascii_lower[chr];
+}
+
+__int32_t __ctype_toupper(int chr)
+{
+    if (chr < 0 || chr > 0x7f)
+        return 0;
+    return __ascii_upper[chr];
 }
 
 
