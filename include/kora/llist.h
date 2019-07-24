@@ -206,7 +206,7 @@ static inline void llist_init(llhead_t *list)
 
 #define MAX_ELMTS 2000
 
-bool quick_sort(int *arr, int elmts)
+static inline bool quick_sort(int *arr, int elmts)
 {
     int piv, beg[MAX_ELMTS], end[MAX_ELMTS], i = 0, L, R;
 
@@ -240,7 +240,7 @@ bool quick_sort(int *arr, int elmts)
     return true;
 }
 
-bool llist_check(llhead_t *list)
+static inline bool llist_check(llhead_t *list)
 {
     llnode_t *node = list->first_;
     if (node == NULL)
@@ -260,12 +260,12 @@ bool llist_check(llhead_t *list)
     return list->count_ == i;
 }
 
-void llist_swap(llhead_t *list, llnode_t *a, llnode_t *b)
+static inline void llist_swap(llhead_t *list, llnode_t *a, llnode_t *b)
 {
     llnode_t *tmp;
 
     tmp = a->next_;
-    a->next_ = b->next;
+    a->next_ = b->next_;
     b->next_ = tmp;
     if (a->next_ != NULL)
         a->next_->prev_ = a;
@@ -289,7 +289,7 @@ void llist_swap(llhead_t *list, llnode_t *a, llnode_t *b)
         list->first_ = b;
 }
 
-void llist_insert_sort(llhead_t *list, llnode_t *node, int off, int(*compare)(void *, void *))
+static inline void llist_insert_sort(llhead_t *list, llnode_t *node, int off, int(*compare)(void *, void *))
 {
     /* if list is empty */
     if (list->first_ == NULL) {
@@ -322,13 +322,13 @@ void llist_insert_sort(llhead_t *list, llnode_t *node, int off, int(*compare)(vo
         node->next_->prev_ = node;
     else
         list->last_ = node;
-    node->prev = cursor;
+    node->prev_ = cursor;
     list->count_++;
 }
 
 
 
-void llist_sort(llhead_t *list, int off, int (*compare)(void *, void *))
+static inline void llist_sort(llhead_t *list, int off, int (*compare)(void *, void *))
 {
     /* Initialize 'sorted' double linked list */
     llhead_t sorted = INIT_LLHEAD;
@@ -344,7 +344,9 @@ void llist_sort(llhead_t *list, int off, int (*compare)(void *, void *))
     }
 
     /* Update list to point on new list */
-    memcpy(list, &sorted, sizeof(sorted));
+    list->first_ = sorted.first_;
+    list->last_ = sorted.last_;
+    list->count_ = sorted.count_;
 }
 
 #endif  /* _KORA_LLIST_H */

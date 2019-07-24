@@ -297,28 +297,3 @@ struct tm *gmtime(const time_t *time)
     return gmtime_r(time, &tm);
 }
 
-/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
-
-long __timezone = 0;
-
-void tzset()
-{
-    // char *ptr;
-    // char *tz = getenv("TZ");
-    // char *s_tm = strtok_r(tz, " ", &ptr);
-    // char *s_off = strtok(NULL, " ", &ptr);
-    // char *d_tm = strtok(NULL, " ", &ptr);
-    // char *d_off = strtok(NULL, " ", &ptr);
-    // char *d_start = strtok(NULL, " ", &ptr);
-    // char *d_end = strtok(NULL, " ", &ptr);
-
-}
-
-// char *timezone(const char *zone, int dst);
-
-struct tm *localtime(const time_t *timep)
-{
-    tzset();
-    time_t local_time = *timep + __timezone;
-    return gmtime(&local_time);
-}

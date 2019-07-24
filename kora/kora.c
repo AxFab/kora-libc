@@ -25,6 +25,7 @@
 // #include <sys/mman.h>
 #include <string.h>
 #include <errno.h>
+#include <time.h>
 
 #define MMAP_HEAP 0x100
 
@@ -165,10 +166,15 @@ void lstat()
 void readlink()
 {
 }
-void localtime_r()
+
+
+time_t time(time_t *ptr)
 {
+    return 0;
 }
-void strftime()
+
+void gethostname(char *buf, int len)
 {
+
 }
 
