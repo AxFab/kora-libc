@@ -14,33 +14,45 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#  This makefile is more or less generic.
-#  The configuration is on `sources.mk`.
-# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 topdir ?= $(shell readlink -f $(dir $(word 1,$(MAKEFILE_LIST))))
 gendir ?= $(shell pwd)
 
 include $(topdir)/var/make/global.mk
+# srcdir = $(topdir)/src
 
-all: libc crt0
-crt0: $(libdir)/crt0.o
-install: $(prefix)/lib/libc.so $(prefix)/lib/crt0.o
+all: libname
+install: $(prefix)/lib/libname.so
 
-DISTO ?= kora
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+CFLAGS ?= -Wall -Wextra -Wno-unused-parameter -ggdb
+CFLAGS += -I$(topdir)/include -fPIC
+
+# SRCS-y += $(wildcard $(srcdir)/dir/*.c)
+# SRCS-y += $(wildcard $(srcdir)/$(DISTO)/*.c)
 
 include $(topdir)/var/make/build.mk
+# include $(topdir)/arch/$(target_arch)/make.mk
 
-SRCS-y += $(wildcard $(srcdir)/c89/*.c)
-SRCS-y += $(wildcard $(srcdir)/c11/*.c)
-SRCS-y += $(wildcard $(srcdir)/$(DISTO)/*.c)
-CFLAGS ?= -Wall -Wextra -Wno-unused-parameter -ggdb
-CFLAGS += -I$(srcdir)/include -fPIC
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-include $(topdir)/arch/$(target_arch)/make.mk
+# DISTO ?= my-disto
 
-$(eval $(call link_shared,c,SRCS,LFLAGS))
+ifeq ($(DISTO),A)
+LFLAGS += -lA
+else ifeq ($(DISTO),B)
+LFLAGS += -lB
+else ifeq ($(DISTO),C)
+CFLAGS += -Dname=C
+LFLAGS += -lC
+endif
 
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+$(eval $(call link_shared,name,SRCS,LFLAGS))
+
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 ifeq ($(NODEPS),)
-include $(call fn_deps,SRCS-y)
+include $(call fn_deps, SRCS)
 endif
