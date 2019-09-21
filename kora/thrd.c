@@ -61,7 +61,7 @@ int thrd_create(thrd_t *thr, thrd_start_t func, void *arg)
     void *params[2];   // void *stack = mmap();
     params[0] = func;
     params[1] = arg;
-    long ret = syscall(SYS_TFORK, 0, &thrd_run_impl_, &params, 2, NULL);
+    long ret = syscall(SYS_TFORK, 0, &thrd_run_impl_, &params, sizeof(params), NULL);
     return ret == 0 ? thrd_error : thrd_success;
 }
 
