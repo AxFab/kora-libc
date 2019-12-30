@@ -92,7 +92,7 @@ int thrd_join(thrd_t thr, int *res)
     return thrd_error;
 }
 
-void thrd_sleep(const struct timespec *restrict time_point)
+void thrd_sleep(const struct timespec *restrict time_point, struct timespec *restrict remaining)
 {
     usleep(time_point->tv_sec * 1000000LL + time_point->tv_nsec / 1000LL);
 }

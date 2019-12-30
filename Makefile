@@ -31,6 +31,8 @@ DISTO ?= kora
 include $(topdir)/var/make/build.mk
 
 SRCS-y += $(wildcard $(srcdir)/c89/*.c)
+SRCS-y += $(wildcard $(srcdir)/c95/*.c)
+SRCS-y += $(wildcard $(srcdir)/c99/*.c)
 SRCS-y += $(wildcard $(srcdir)/c11/*.c)
 SRCS-y += $(wildcard $(srcdir)/$(DISTO)/*.c)
 CFLAGS ?= -Wall -Wextra -Wno-unused-parameter -ggdb
