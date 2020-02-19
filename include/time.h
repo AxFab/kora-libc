@@ -5,6 +5,7 @@
 // #include "features.h"
 // #include "bits/time.h"
 #include <bits/types.h>
+#include <bits/timespec.h>
 
 
 enum {
@@ -24,10 +25,6 @@ typedef __time_t time_t;
 typedef __clockid_t clockid_t;
 typedef __timer_t timer_t;
 
-struct timespec {
-    __time_t tv_sec;
-    __syscall_slong_t tv_nsec;
-};
 
 struct tm {
     int tm_sec;

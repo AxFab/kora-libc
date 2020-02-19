@@ -2,7 +2,7 @@
 #define __CTYPE_H 1
 
 
-#include <_stdc/crt.h>
+// #include <_stdc/crt.h>
 // #include <_stdc/crt.c>
 
 #include <bits/types.h>

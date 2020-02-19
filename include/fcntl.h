@@ -4,6 +4,7 @@
 #include <bits/cdefs.h>
 // features
 #include <bits/stat.h>
+#include <bits/timespec.h>
 // kernel flags
 
 struct flock {
@@ -18,11 +19,6 @@ typedef __mode_t mode_t;
 typedef __off_t off_t;
 typedef __pid_t pid_t;
 
-// # 120 "/usr/include/time.h" 3 4
-struct timespec {
-    __time_t tv_sec;
-    __syscall_slong_t tv_nsec;
-};
 
 
 int fcntl(int fd, int cmd, ...);

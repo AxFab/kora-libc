@@ -20,7 +20,7 @@
 topdir ?= $(shell readlink -f $(dir $(word 1,$(MAKEFILE_LIST))))
 gendir ?= $(shell pwd)
 
-include $(topdir)/var/make/global.mk
+include $(topdir)/make/global.mk
 
 all: libc crt0
 crt0: $(libdir)/crt0.o
@@ -28,7 +28,7 @@ install: $(prefix)/lib/libc.so $(prefix)/lib/crt0.o
 
 DISTO ?= kora
 
-include $(topdir)/var/make/build.mk
+include $(topdir)/make/build.mk
 
 SRCS-y += $(wildcard $(srcdir)/c89/*.c)
 SRCS-y += $(wildcard $(srcdir)/c95/*.c)

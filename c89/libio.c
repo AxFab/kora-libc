@@ -20,8 +20,10 @@
 #include <assert.h>
 #include <string.h>
 #include <errno.h>
+#include <bits/alloc.h>
 #include <bits/libio.h>
-#include <_stdc/crt.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 /* Parse the character base mode for opening file and return binary mode
  * The mode parameter must start by on of this sequence:
