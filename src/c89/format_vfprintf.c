@@ -151,7 +151,7 @@ static const char state[]_I('z' + 1) = {
     },
 };
 
-static inline void pop_arg(format_arg_t *arg, int type, va_list *ap)
+static inline void pop_arg(format_arg_t *arg, int type, va_list ap)
 {
     /* Give the compiler a hint for optimizing the switch. */
     if ((unsigned)type > MAXSTATE)
@@ -159,70 +159,70 @@ static inline void pop_arg(format_arg_t *arg, int type, va_list *ap)
 
     switch (type) {
     case PTR:
-        arg->p = va_arg(*ap, void *);
+        arg->p = va_arg(ap, void *);
         break;
     case INT:
-        arg->s = va_arg(*ap, int);
+        arg->s = va_arg(ap, int);
         break;
     case UINT:
-        arg->i = va_arg(*ap, unsigned int);
+        arg->i = va_arg(ap, unsigned int);
         break;
     case SHORT:
-        arg->s = (short)va_arg(*ap, int);
+        arg->s = (short)va_arg(ap, int);
         break;
     case USHORT:
-        arg->i = (unsigned short)va_arg(*ap, int);
+        arg->i = (unsigned short)va_arg(ap, int);
         break;
     case CHAR:
-        arg->s = (signed char)va_arg(*ap, int);
+        arg->s = (signed char)va_arg(ap, int);
         break;
     case UCHAR:
-        arg->i = (unsigned char)va_arg(*ap, int);
+        arg->i = (unsigned char)va_arg(ap, int);
         break;
     case DBL:
-        arg->f = va_arg(*ap, double);
+        arg->f = va_arg(ap, double);
         break;
     case LDBL:
-        arg->f = va_arg(*ap, long double);
+        arg->f = va_arg(ap, long double);
         break;
 #ifndef LONG_IS_INT
     case LONG:
-        arg->s = va_arg(*ap, long);
+        arg->s = va_arg(ap, long);
         break;
     case ULONG:
-        arg->i = va_arg(*ap, unsigned long);
+        arg->i = va_arg(ap, unsigned long);
         break;
 #endif
 #ifdef __USE_C99
     case ULLONG:
-        arg->i = va_arg(*ap, unsigned long long);
+        arg->i = va_arg(ap, unsigned long long);
         break;
     case LLONG:
-        arg->s = va_arg(*ap, long long);
+        arg->s = va_arg(ap, long long);
         break;
 #endif
 #ifdef ODD_TYPES
     case SIZET:
-        arg->i = va_arg(*ap, size_t);
+        arg->i = va_arg(ap, size_t);
         break;
     case IMAX:
-        arg->s = va_arg(*ap, intmax_t);
+        arg->s = va_arg(ap, intmax_t);
         break;
     case UMAX:
-        arg->i = va_arg(*ap, uintmax_t);
+        arg->i = va_arg(ap, uintmax_t);
         break;
     case PDIFF:
-        arg->i = va_arg(*ap, ptrdiff_t);
+        arg->i = va_arg(ap, ptrdiff_t);
         break;
     case UIPTR:
-        arg->i = (uintptr_t)va_arg(*ap, void *);
+        arg->i = (uintptr_t)va_arg(ap, void *);
         break;
 #endif
     }
 }
 
 static inline int read_format_specifier(format_spec_t *sb, const char **ptr,
-                                        va_list *ap)
+                                        va_list ap)
 {
     int ty;
     char sign;
@@ -242,14 +242,14 @@ static inline int read_format_specifier(format_spec_t *sb, const char **ptr,
     /* Read field width */
     if (*str == '*') {
         str++;
-        sb->field_ = va_arg(*ap, int);
+        sb->field_ = va_arg(ap, int);
     } else
         sb->field_ = (int)_strtox(str, (char **)&str, 10, &sign);
 
     /* Read precision */
     if (str[0] == '.' && str[1] == '*') {
         str += 2;
-        sb->precis_ = va_arg(*ap, int);
+        sb->precis_ = va_arg(ap, int);
     } else if (str[0] == '.') {
         str++;
         sb->precis_ = (int)_strtox(str, (char **)&str, 10, &sign);
@@ -322,14 +322,14 @@ int _PRT(vfprintf)(FILE *fp, const char *str, va_list ap)
         /* Read format specifier */
         str++;
 
-        if (read_format_specifier(&sb, &str, &ap) < 0)
+        if (read_format_specifier(&sb, &str, ap) < 0)
             return -1;
 
 
         if (sb.flag_ & LEFT_ADJ)
             sb.flag_ &= ~ZERO_PAD;
 
-        pop_arg(&arg, sb.type_, &ap);
+        pop_arg(&arg, sb.type_, ap);
         lg = 0;
 
         switch (str[-1]) {

@@ -17,18 +17,17 @@
  *
  *   - - - - - - - - - - - - - - -
  */
-#ifndef __ERRNO_H
-#define __ERRNO_H 1
+#ifndef __STDALIGN_H
+#define __STDALIGN_H 1
 
-#include <bits/cdefs.h>
-#include <bits/errno.h>
+#ifndef __cplusplus
 
-__STDC_GUARD
+#define alignas _Alignas
+#define alignof _Alignof
 
-int *__errno_location(void);
-#undef errno
-#define errno  (*__errno_location())
+#endif
 
-__STDC_END
+#define __alignas_is_defined 1
+#define __alignof_is_defined 1
 
-#endif  /* _ERRNO_H */
+#endif  /* __STDALIGN_H */

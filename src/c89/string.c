@@ -18,6 +18,7 @@
  *   - - - - - - - - - - - - - - -
  */
 #include <stddef.h>
+#include <ctype.h>
 
 void *malloc(size_t);
 // #include <stdlib.h>
@@ -221,7 +222,15 @@ char *strcpy(char *dest, const char *src)
 size_t strcspn(const char *s1, const char *s2);
 
 /* Performs case-insensitive string comparison. */
-int stricmp(const char *s1, const char *s2);
+int stricmp(const char *s1, const char *s2)
+{
+    while (*s1 && (tolower(*s1) == tolower(*s2))) {
+        ++s1;
+        ++s2;
+    }
+
+    return *s1 - *s2;
+}
 
 /* Calculates length of a string. */
 size_t strlen(const char *str)
@@ -296,7 +305,10 @@ char *strrchr(const char *str, int c)
 size_t strspn(const char *s1, const char *s2);
 
 /* Finds the first occurrence of a substring in another string. */
-char *strstr(const char *str, const char *substr);
+char *strstr(const char *str, const char *substr)
+{
+    return NULL;
+}
 
 /* Scans s1 for the first token not contained in s2. */
 char *strtok(char *s1, const char *s2)
@@ -332,7 +344,16 @@ char *strlwr(char *str);
 char *strupr(char *string);
 
 /* Compare characters of two strings without regard to case. */
-int strnicmp(const char *s1, const char *s2, size_t maxlen);
+int strnicmp(const char *s1, const char *s2, size_t maxlen)
+{
+    while (--maxlen && *s1 && tolower(*s1) == tolower(*s2)) {
+        ++s1;
+        ++s2;
+    }
+
+    return *s1 - *s2;
+}
+
 
 /* Reverse characters of a string. */
 char *strrev(char *string);

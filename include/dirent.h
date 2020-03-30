@@ -18,7 +18,13 @@
  *   - - - - - - - - - - - - - - -
  */
 #ifndef __DIRENT_H
-#define __DIRENT_H
+#define __DIRENT_H 1
+
+#include <bits/cdefs.h>
+#if !defined __UNIX && !defined __POSIX
+#error "The header <dirent.h> requires unix or posix support."
+#endif
+
 
 /* We require __ssize_t, __ino_t and __off_t */
 #include <bits/types.h>

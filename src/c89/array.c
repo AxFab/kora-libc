@@ -18,7 +18,7 @@
  *   - - - - - - - - - - - - - - -
  */
 #include <string.h>
-#include <bits/alloc.h>
+#include <bits/crt.h>
 
 
 static void memswap(void *a, void *b, void *t, size_t sz)
@@ -64,5 +64,22 @@ void qsort(void *base, size_t nmemb, size_t size, int (*compar)(const void *, co
 
 
 /* Binary search of a sorted array */
-void *bsearch(const void *key, const void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *));
+void *bsearch(const void *key, const void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *))
+{
 
+    void *ptr;
+    int sign;
+    while (nmemb > 0) {
+        ptr = (char *)base + size * (nmemb / 2);
+        sign = compar(key, ptr);
+        if (sign < 0) {
+            nmemb /= 2;
+        } else if (sign > 0) {
+            base = (char *)ptr + size;
+            nmemb -= nmemb / 2 + 1;
+        } else {
+            return ptr;
+        }
+    }
+    return NULL;
+}

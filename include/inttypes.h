@@ -17,18 +17,25 @@
  *
  *   - - - - - - - - - - - - - - -
  */
-#ifndef __ERRNO_H
-#define __ERRNO_H 1
+#ifndef __INTTYPES_H
+#define __INTTYPES_H 1
 
-#include <bits/cdefs.h>
-#include <bits/errno.h>
+#include <stdint.h>
+#include <bits/wchar.h>
 
 __STDC_GUARD
 
-int *__errno_location(void);
-#undef errno
-#define errno  (*__errno_location())
+typedef struct { intmax_t quot, rem; } imaxdiv_t;
+
+intmax_t imaxabs(intmax_t);
+imaxdiv_t imaxdiv(intmax_t, intmax_t);
+
+intmax_t strtoimax(const char *__restrict, char **__restrict, int);
+uintmax_t strtoumax(const char *__restrict, char **__restrict, int);
+
+intmax_t wcstoimax(const wchar_t *__restrict, wchar_t **__restrict, int);
+uintmax_t wcstoumax(const wchar_t *__restrict, wchar_t **__restrict, int);
 
 __STDC_END
 
-#endif  /* _ERRNO_H */
+#endif  /* _INTTYPES_H */

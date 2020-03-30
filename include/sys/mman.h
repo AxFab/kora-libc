@@ -1,9 +1,12 @@
-#ifndef __SYS_MMAN_H
-#define __SYS_MMAN_H 1
+#ifndef _SYS_MMAN_H
+#define _SYS_MMAN_H 1
+
+#include <bits/types.h>
+
+void *mmap(void *addr, size_t length, int prot, int flags, int fd, __off_t off);
+int munmap(void *addr, size_t length);
 
 
-void *mmap(void *addr, size_t len, int flags, int prot, int fd, off_t off);
-void munmap(void *addr, size_t len);
 
 
-#endif  /* __SYS_MMAN_H */
+#endif  /* _SYS_MMAN_H */

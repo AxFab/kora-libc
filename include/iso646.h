@@ -17,18 +17,23 @@
  *
  *   - - - - - - - - - - - - - - -
  */
-#ifndef __ERRNO_H
-#define __ERRNO_H 1
+#ifndef __ISO646_H
+#define __ISO646_H 1
 
-#include <bits/cdefs.h>
-#include <bits/errno.h>
+#ifndef __cplusplus
 
-__STDC_GUARD
+#define and    &&
+#define and_eq &=
+#define bitand &
+#define bitor  |
+#define compl  ~
+#define not    !
+#define not_eq !=
+#define or     ||
+#define or_eq  |=
+#define xor    ^
+#define xor_eq ^=
 
-int *__errno_location(void);
-#undef errno
-#define errno  (*__errno_location())
+#endif
 
-__STDC_END
-
-#endif  /* _ERRNO_H */
+#endif  /* __ISO646_H */

@@ -17,18 +17,13 @@
  *
  *   - - - - - - - - - - - - - - -
  */
-#ifndef __ERRNO_H
-#define __ERRNO_H 1
+#ifndef __STDNORETURN_H
+#define __STDNORETURN_H 1
 
 #include <bits/cdefs.h>
-#include <bits/errno.h>
 
-__STDC_GUARD
+#ifndef __cplusplus
+#define noreturn _Noreturn
+#endif
 
-int *__errno_location(void);
-#undef errno
-#define errno  (*__errno_location())
-
-__STDC_END
-
-#endif  /* _ERRNO_H */
+#endif  /* __STDNORETURN_H */

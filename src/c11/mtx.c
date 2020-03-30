@@ -30,7 +30,7 @@ int mtx_timedlock(mtx_t *restrict mutex, const struct timespec *restrict time_po
         c = atomic_compare_exchange_strong(&mutex->value, &s, 1);
         if (c)
             return 0;
-        RELAX;
+        __asm_pause_;
     }
 
     /* the lock is now contended */
@@ -68,7 +68,7 @@ int mtx_trylock(mtx_t *mutex)
         c = atomic_compare_exchange_strong(&mutex->value, &s, 1);
         if (c)
             return 0;
-        RELAX;
+        __asm_pause_;
     }
     return thrd_busy;
 }
@@ -92,7 +92,7 @@ int mtx_unlock(mtx_t *mutex)
             if (c)
                 return 0;
         }
-        RELAX;
+        __asm_pause_;
     }
 
     /* we need to wake someone up */

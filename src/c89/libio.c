@@ -20,10 +20,8 @@
 #include <assert.h>
 #include <string.h>
 #include <errno.h>
-#include <bits/alloc.h>
 #include <bits/libio.h>
-#include <unistd.h>
-#include <fcntl.h>
+#include <bits/crt.h>
 
 /* Parse the character base mode for opening file and return binary mode
  * The mode parameter must start by on of this sequence:
@@ -266,40 +264,41 @@ FILE *fdopen(int fd, const char *mode)
 FILE *freopen(const char *path, const char *mode, FILE *stream)
 {
     FILE *newstm;
-    int oflg = oflags(mode);
+    // int oflg = oflags(mode);
     FLOCK(stream);
     fflush_unlocked(stream);
 
-    if (!path) {
-        if (oflg & O_CLOEXEC)
-            fcntl(stream->fd_, F_SETFD, FD_CLOEXEC);
-        oflg &= ~(O_CREAT | O_EXCL | O_CLOEXEC);
-        if (fcntl(stream->fd_, F_SETFL, oflg) < 0) {
-            fclose(stream);
-            return NULL;
-        }
-    } else {
-        newstm = fopen(path, mode);
-        if (!newstm) {
-            fclose(stream);
-            return NULL;
-        }
-        if (newstm->fd_ == stream->fd_)
-            newstm->fd_ = -1; /* avoid closing in fclose */
-        // else if (__dup3(f2->fd, f->fd, oflg & O_CLOEXEC) < 0) {
-        //   fclose(newstm);
-        //   fclose(stream);
-        //   return NULL;
-        // }
+    // if (!path) {
+    //     if (oflg & O_CLOEXEC)
+    //         fcntl(stream->fd_, F_SETFD, FD_CLOEXEC);
+    //     oflg &= ~(O_CREAT | O_EXCL | O_CLOEXEC);
+    //     if (fcntl(stream->fd_, F_SETFL, oflg) < 0) {
+    //         fclose(stream);
+    //         return NULL;
+    //     }
+    //     FUNLOCK(stream);
+    //     return stream;
+    // }
 
-        stream->flags_ = (stream->flags_ & F_PERM) | newstm->flags_;
-        stream->read = newstm->read;
-        stream->write = newstm->write;
-        stream->seek = newstm->seek;
-        // stream->close = newstm->close;
-        fclose(newstm);
+    newstm = fopen(path, mode);
+    if (!newstm) {
+        fclose(stream);
+        return NULL;
     }
+    if (newstm->fd_ == stream->fd_)
+        newstm->fd_ = -1; /* avoid closing in fclose */
+    // else if (__dup3(f2->fd, f->fd, oflg & O_CLOEXEC) < 0) {
+    //   fclose(newstm);
+    //   fclose(stream);
+    //   return NULL;
+    // }
 
+    stream->flags_ = (stream->flags_ & F_PERM) | newstm->flags_;
+    stream->read = newstm->read;
+    stream->write = newstm->write;
+    stream->seek = newstm->seek;
+    // stream->close = newstm->close;
+    fclose(newstm);
     FUNLOCK(stream);
     return stream;
 }
@@ -411,10 +410,16 @@ int fileno(FILE *stream)
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
 /* Stream buffering operations */
-void setbuf(FILE *stream, char *buf);
+void setbuf(FILE *stream, char *buf)
+{
+
+}
 
 /* Stream buffering operations */
-int setvbuf(FILE *stream, char *buf, int mode, size_t size);
+int setvbuf(FILE *stream, char *buf, int mode, size_t size)
+{
+    return -1;
+}
 
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
@@ -499,7 +504,16 @@ int putc(int c, FILE *stream)
 }
 
 /* Write a string, followed by a newline, to stdout. */
-int puts(const char *s);
+int puts(const char *s)
+{
+    int lg = strlen(s);
+    size_t ret = fwrite(s, lg, 1, stdout);
+    if ((int)ret == lg) {
+        ret = fwrite("\n", 1, 1, stdout);
+        return lg + 1;
+    }
+    return EOF;
+}
 
 
 /* Write a string to STREAM. */

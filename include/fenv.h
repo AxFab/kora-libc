@@ -17,18 +17,28 @@
  *
  *   - - - - - - - - - - - - - - -
  */
-#ifndef __ERRNO_H
-#define __ERRNO_H 1
+#ifndef __FENV_H
+#define __FENV_H 1
 
 #include <bits/cdefs.h>
-#include <bits/errno.h>
+#include <bits/fenv.h>
 
 __STDC_GUARD
 
-int *__errno_location(void);
-#undef errno
-#define errno  (*__errno_location())
+int feclearexcept(int);
+int fegetexceptflag(fexcept_t *, int);
+int feraiseexcept(int);
+int fesetexceptflag(const fexcept_t *, int);
+int fetestexcept(int);
+
+int fegetround(void);
+int fesetround(int);
+
+int fegetenv(fenv_t *);
+int feholdexcept(fenv_t *);
+int fesetenv(const fenv_t *);
+int feupdateenv(const fenv_t *);
 
 __STDC_END
 
-#endif  /* _ERRNO_H */
+#endif  /* __FENV_H */

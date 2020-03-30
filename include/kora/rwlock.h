@@ -64,7 +64,7 @@ static inline void rwlock_rdlock(rwlock_t *lock)
 
         atomic_dec(&lock->readers);
         while (splock_locked(&lock->lock))
-            RELAX;
+            __asm_pause_;
     }
 }
 
@@ -73,7 +73,7 @@ static inline void rwlock_wrlock(rwlock_t *lock)
 {
     splock_lock(&lock->lock);
     while (lock->readers)
-        RELAX;
+        __asm_pause_;
 }
 
 /* Release a lock previously taken for reading */
@@ -124,7 +124,7 @@ static inline bool rwlock_upgrade(rwlock_t *lock)
 
     atomic_dec(&lock->readers);
     while (lock->readers)
-        RELAX;
+        __asm_pause_;
 
     return true;
 }

@@ -18,7 +18,7 @@ typedef enum {
 // # 1 "/usr/include/x86_64-linux-gnu/bits/waitstatus.h" 1 3 4
 
 
-#include <sys/types.h>
+#include <bits/types.h>
 
 
 
@@ -156,7 +156,20 @@ int lcong48_r(unsigned short int param[7],  struct drand48_data *buffer);
 
 
 
-#include <bits/alloc.h>
+
+
+
+
+
+void *malloc(size_t size);
+void *calloc(size_t nmemb, size_t size);
+
+void *realloc(void *ptr, size_t size);
+
+void free(void *ptr);
+void cfree(void *ptr);
+
+
 
 // # 1 "/usr/include/alloca.h" 1 3 4
 // # 24 "/usr/include/alloca.h" 3 4
@@ -166,6 +179,11 @@ void *alloca(size_t size);
 
 
 
+
+void *valloc(size_t size);
+
+int posix_memalign(void **memptr, size_t alignment, size_t size);
+void *aligned_alloc(size_t alignment, size_t size);
 
 
 

@@ -173,6 +173,11 @@ time_t time(time_t *ptr)
     return 0;
 }
 
+clock_t clock()
+{
+    return 0;
+}
+
 void gethostname(char *buf, int len)
 {
 

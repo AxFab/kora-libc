@@ -2,10 +2,14 @@
 #define __FCNTL_H 1
 
 #include <bits/cdefs.h>
-// features
+#if !defined __UNIX && !defined __POSIX
+#error "The header <fcntl.h> requires unix or posix support."
+#endif
+
+
 #include <bits/stat.h>
-#include <bits/timespec.h>
 // kernel flags
+#include <bits/timespec.h>
 
 struct flock {
     short int l_type;
@@ -18,7 +22,6 @@ struct flock {
 typedef __mode_t mode_t;
 typedef __off_t off_t;
 typedef __pid_t pid_t;
-
 
 
 int fcntl(int fd, int cmd, ...);

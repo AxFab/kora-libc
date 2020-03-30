@@ -1,24 +1,40 @@
-#ifndef __ASSERT_H
-#define __ASSERT_H 1
-
+/*
+ *      This file is part of the KoraOS project.
+ *  Copyright (C) 2015-2019  <Fabien Bavent>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *   - - - - - - - - - - - - - - -
+ */
 #include <bits/cdefs.h>
-// features.h
 
-#if defined __FUNC__
-#define assert(n) do { \
-    if (!(n)) \
-        __assert_fail(#n, __FILE__, __LINE__,__FUNC__); \
-    } while(0)
+#undef assert
+#undef static_assert
+
+#if defined NDEBUG
+# define assert(n)  ((void)0)
 #else
-#define assert(n) do { \
-    if (!(n)) \
-        __assert(#n, __FILE__, __LINE__); \
-    } while(0)
+# define assert(n)   ((void)((n) || (__assert_fail(#n, __FILE__, __LINE__,__func__),0)))
 #endif
 
-_Noreturn void __assert_fail(const char *assertion, const char *file, unsigned int line, const char *function);
-_Noreturn void __assert_perror_fail(int errnum, const char *file, unsigned int line, const char *function);
-_Noreturn void __assert(const char *assertion, const char *file, int line);
+#if defined __C11 && !defined __cplusplus
+# define static_assert _Static_assert
+#endif
 
+__STDC_GUARD
 
-#endif  /* __ASSERT_H */
+_Noreturn void __assert_fail(const char *assertion, const char *file, unsigned line, const char *function);
+
+__STDC_END
+

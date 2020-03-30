@@ -17,17 +17,39 @@
  *
  *   - - - - - - - - - - - - - - -
  */
+#ifndef __SETJMP_H
+#define __SETJMP_H 1
 
-CTYPE(isalnum)
-CTYPE(isalpha)
-CTYPE(iscntrl)
-CTYPE(isdigit)
-CTYPE(islower)
-CTYPE(isgraph)
-CTYPE(isprint)
-CTYPE(ispunct)
-CTYPE(isspace)
-CTYPE(isupper)
-CTYPE(isxdigit)
+#include <bits/cdefs.h>
+#include <bits/setjmp.h>
 
-CTYPE(isblank)
+__STDC_GUARD
+
+typedef struct __jmp_buf_ex {
+    __jmp_buf __jb;
+    unsigned long __fl;
+    unsigned long __ss[128/sizeof(long)];
+} jmp_buf[1];
+
+
+#define setjmp setjmp
+int setjmp (jmp_buf);
+_Noreturn void longjmp (jmp_buf, int);
+
+
+#if defined __UNIX
+int _setjmp (jmp_buf);
+_Noreturn void _longjmp (jmp_buf, int);
+#endif
+
+
+#if defined __POSIX || defined __UNIX
+typedef jmp_buf sigjmp_buf;
+int sigsetjmp (sigjmp_buf, int);
+_Noreturn void siglongjmp (sigjmp_buf, int);
+#endif
+
+
+__STDC_END
+
+#endif  /* __SETJMP_H */

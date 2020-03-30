@@ -7,7 +7,6 @@
 #include <bits/types.h>
 #include <bits/timespec.h>
 
-
 enum {
     CLOCK_MONOTONIC = 0,
     CLOCK_REALTIME,
@@ -19,12 +18,12 @@ enum {
 #define TMSPEC_TO_USEC(t)  ((t).tv_sec*1000000LL+(t).tv_nsec/1000L)
 
 
+#define CLOCKS_PER_SEC  ((clock_t)1000000)
 
 typedef __clock_t clock_t;
 typedef __time_t time_t;
 typedef __clockid_t clockid_t;
 typedef __timer_t timer_t;
-
 
 struct tm {
     int tm_sec;

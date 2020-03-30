@@ -17,18 +17,17 @@
  *
  *   - - - - - - - - - - - - - - -
  */
-#ifndef __ERRNO_H
-#define __ERRNO_H 1
+#ifndef __STDBOOL_H
+#define __STDBOOL_H 1
 
-#include <bits/cdefs.h>
-#include <bits/errno.h>
+#ifndef __cplusplus
 
-__STDC_GUARD
+#define true 1
+#define false 0
+#define bool _Bool
 
-int *__errno_location(void);
-#undef errno
-#define errno  (*__errno_location())
+#endif
 
-__STDC_END
+#define __bool_true_false_are_defined 1
 
-#endif  /* _ERRNO_H */
+#endif  /* __STDBOOL_H */

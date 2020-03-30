@@ -1,3 +1,4 @@
+#define _NO_CTYPE_MACRO  1
 #include <ctype.h>
 
 
@@ -20,7 +21,7 @@ const unsigned short int __ascii_b[] = {
     0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000,
 };
 
-const __int32_t __ascii_lower[] = {
+const int __ascii_lower[] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
     0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
@@ -39,7 +40,7 @@ const __int32_t __ascii_lower[] = {
     0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F,
 };
 
-const __int32_t __ascii_upper[] = {
+const int __ascii_upper[] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
     0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
@@ -64,14 +65,14 @@ const unsigned short int **__ctype_b_loc(void)
     return (const unsigned short **)(&__ascii_b);
 }
 
-const __int32_t **__ctype_tolower_loc(void)
+const int **__ctype_tolower_loc(void)
 {
-    return (const __int32_t **)(&__ascii_lower);
+    return (const int **)(&__ascii_lower);
 }
 
-const __int32_t **__ctype_toupper_loc(void)
+const int **__ctype_toupper_loc(void)
 {
-    return (const __int32_t **)(&__ascii_upper);
+    return (const int **)(&__ascii_upper);
 }
 
 
@@ -82,18 +83,102 @@ unsigned short int __ctype_b(int chr)
     return __ascii_b[chr];
 }
 
-__int32_t __ctype_tolower(int chr)
+int __ctype_tolower(int chr)
 {
     if (chr < 0 || chr > 0x7f)
         return 0;
     return __ascii_lower[chr];
 }
 
-__int32_t __ctype_toupper(int chr)
+int __ctype_toupper(int chr)
 {
     if (chr < 0 || chr > 0x7f)
         return 0;
     return __ascii_upper[chr];
+}
+
+
+
+
+int isalnum(int c)
+{
+    return _ISalnum & __ctype_b(c);
+}
+
+int isalpha(int c)
+{
+    return _ISalpha & __ctype_b(c);
+}
+
+int iscntrl(int c)
+{
+    return _IScntrl & __ctype_b(c);
+}
+
+int isdigit(int c)
+{
+    return _ISdigit & __ctype_b(c);
+}
+
+int islower(int c)
+{
+    return _ISlower & __ctype_b(c);
+}
+
+int isgraph(int c)
+{
+    return _ISgraph & __ctype_b(c);
+}
+
+int isprint(int c)
+{
+    return _ISprint & __ctype_b(c);
+}
+
+int ispunct(int c)
+{
+    return _ISpunct & __ctype_b(c);
+}
+
+int isspace(int c)
+{
+    return _ISspace & __ctype_b(c);
+}
+
+int isupper(int c)
+{
+    return _ISupper & __ctype_b(c);
+}
+
+int isxdigit(int c)
+{
+    return _ISxdigit & __ctype_b(c);
+}
+
+int isblank(int c)
+{
+    return _ISblank & __ctype_b(c);
+}
+
+
+int tolower(int c)
+{
+    return __ctype_tolower(c);
+}
+
+int toupper(int c)
+{
+    return __ctype_toupper(c);
+}
+
+int isascii(int c)
+{
+    return (unsigned)(c) < 128;
+}
+
+int toascii(int c)
+{
+    return _ISalpha & __ctype_b(c);
 }
 
 
