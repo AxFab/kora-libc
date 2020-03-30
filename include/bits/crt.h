@@ -1,6 +1,7 @@
 #ifndef __BITS_CRT_H
 #define __BITS_CRT_H 1
 
+#include <stddef.h>
 
 void *malloc(size_t len);
 void free(void *ptr);

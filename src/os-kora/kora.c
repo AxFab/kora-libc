@@ -146,15 +146,7 @@ void __libc_init()
     stderr = fvopen(2, O_WRONLY);
 }
 
-void opendir()
-{
-}
-void readdir()
-{
-}
-void closedir()
-{
-}
+
 
 
 void stat()

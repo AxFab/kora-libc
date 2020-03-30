@@ -8,7 +8,7 @@
 
 
 #include <bits/stat.h>
-// kernel flags
+#include <bits/libio.h>
 #include <bits/timespec.h>
 
 struct flock {
