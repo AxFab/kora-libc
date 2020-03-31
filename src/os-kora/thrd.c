@@ -34,7 +34,17 @@ void usleep(__useconds_t usec)
 
 int __exec(char *name, const char **argv, const char **env, int fds[3])
 {
-    return syscall(SYS_PFORK, 0, name, argv, env, fds);
+    int pipe_in[2];
+    int pipe_out[2];
+    pipe(pipe_in);
+    pipe(pipe_out);
+    fds[0] = pipe_in[1];
+    fds[1] = pipe_out[0];
+    fds[2] = pipe_out[0];
+    int ret = syscall(SYS_PFORK, 0, name, argv, env, fds);
+    close(pipe_in[0]);
+    close(pipe_out[1]);
+    return ret;
 }
 
 _Noreturn void exit(int res)

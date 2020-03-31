@@ -70,3 +70,16 @@ int window(int service, int width, int height, int flags)
 {
     return syscall(SYS_WINDOW, service, width, height, flags);
 }
+
+
+int pipe2(int fds[2], int flags)
+{
+    return syscall(SYS_PIPE, flags);
+}
+
+
+int pipe(int fds[2])
+{
+    return pipe2(fds, 0);
+}
+
