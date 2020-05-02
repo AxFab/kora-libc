@@ -74,7 +74,7 @@ int window(int service, int width, int height, int flags)
 
 int pipe2(int fds[2], int flags)
 {
-    return syscall(SYS_PIPE, flags);
+    return syscall(SYS_PIPE, fds, flags);
 }
 
 

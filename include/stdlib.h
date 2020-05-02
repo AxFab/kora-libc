@@ -86,16 +86,16 @@ char *setstate(char *statebuf);
 
 
 struct random_data {
-    int32_t *fptr;
-    int32_t *rptr;
-    int32_t *state;
+    __int32_t *fptr;
+    __int32_t *rptr;
+    __int32_t *state;
     int rand_type;
     int rand_deg;
     int rand_sep;
-    int32_t *end_ptr;
+    __int32_t *end_ptr;
 };
 
-int random_r(struct random_data *restrict buf, int32_t *restrict result);
+int random_r(struct random_data *restrict buf, __int32_t *restrict result);
 int srandom_r(unsigned int seed, struct random_data *buf);
 int initstate_r(unsigned int seed, char *restrict statebuf, size_t statelen,  struct random_data *restrict buf);
 int setstate_r(char *restrict statebuf, struct random_data *restrict buf);

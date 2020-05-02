@@ -35,13 +35,9 @@ typedef long fpos_t;
 #define TMP_MAX 10000
 #define L_tmpnam 20
 
-extern FILE *const stdin;
-extern FILE *const stdout;
-extern FILE *const stderr;
-
-#define stdin  (stdin)
-#define stdout (stdout)
-#define stderr (stderr)
+#define _IO_stdin_ stdin
+#define _IO_stdout_ stdout
+#define _IO_stderr_ stderr
 
 
 FILE *fopen(const char *restrict filename, const char *restrict modes);

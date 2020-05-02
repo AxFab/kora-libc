@@ -28,7 +28,7 @@
 
 /* We require __ssize_t, __ino_t and __off_t */
 #include <bits/types.h>
-#include <bits/posix1_lim.h>
+// #include <bits/posix1_lim.h>
 #include <stddef.h>
 
 struct dirent {
