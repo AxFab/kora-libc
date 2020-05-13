@@ -26,6 +26,7 @@
 #include <string.h>
 #include <errno.h>
 #include <time.h>
+#include <sys/stat.h>
 
 #define MMAP_HEAP 0x100
 
@@ -147,14 +148,67 @@ void __libc_init()
 }
 
 
+int file_stat_mode[] = { -1,
+    S_IFREG, S_IFBLK, S_IFIFO, S_IFCHR,
+    S_IFCHR, S_IFSOCK, S_IFLNK, S_IFREG,
+    S_IFCHR, S_IFCHR, S_IFDIR, S_IFDIR,
+    S_IFCHR, S_IFCHR
+    };
 
 
-void stat()
+typedef struct filemeta filemeta_t;
+int stat_(const char *path, int dir, struct stat *stat, int flags)
 {
+    filemeta_t meta;
+    int ret = syscall(SYS_FSTAT, dir, path, &meta, flags);
+    if (ret < 0)
+        return -1;
+
+    // dev_t     st_dev;     /* ID of device containing file */
+    stat->st_ino = meta.ino;
+    // nlink_t   st_nlink;   /* number of hard links */
+    // uid_t     st_uid;     /* user ID of owner */
+    // gid_t     st_gid;     /* group ID of owner */
+    // dev_t     st_rdev;    /* device ID (if special file) */
+
+    // off_t     st_size;    /* total size, in bytes */
+    // blksize_t st_blksize; /* blocksize for file system I/O */
+    // blkcnt_t  st_blocks;  /* number of 512B blocks allocated */
+    stat->st_size = meta.size;
+    stat->st_blksize = meta.block;
+    stat->st_blocks = ALIGN_UP(meta.rsize, 512) / 512;
+
+    // time_t    st_atime;   /* time of last access */
+    // time_t    st_mtime;   /* time of last modification */
+    // time_t    st_ctime;   /* time of last status change */
+    stat->st_ctime = USEC_TO_SEC(meta.ctime);
+    stat->st_ctimensec = NSEC_OF_USEC(meta.ctime);
+    stat->st_mtime = USEC_TO_SEC(meta.mtime);
+    stat->st_mtimensec = NSEC_OF_USEC(meta.mtime);
+    stat->st_atime = USEC_TO_SEC(meta.atime);
+    stat->st_atimensec = NSEC_OF_USEC(meta.atime);
+
+    // mode_t    st_mode;    /* protection */
+    stat->st_mode = file_stat_mode[meta.ftype];
 }
-void lstat()
+
+
+int stat(const char *path, struct stat *stat)
 {
+    return stat_(path, -1, stat, 1);
 }
+
+int lstat(const char *path, struct stat *stat)
+{
+    return stat_(path, -1, stat, 0);
+}
+
+int fstat(int fd, struct stat *stat)
+{
+    return stat_(NULL, fd, stat, 1);
+}
+
+
 void readlink()
 {
 }

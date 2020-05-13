@@ -45,6 +45,13 @@
 #define MAX3(a,b,c)    MAX(a,MAX(b,c))
 #define POW2(v)     ((v) != 0 && ((v) & ((v)-1)) == 0)
 
+#define MIN_TO_USEC(s)  ((s)*60000000LL)
+#define SEC_TO_USEC(s)  ((s)*1000000LL)
+#define MSEC_TO_USEC(s)  ((s)*1000LL)
+#define TMSPEC_TO_USEC(t)  ((t).tv_sec*1000000LL+(t).tv_nsec/1000L)
+#define USEC_TO_SEC(s)  ((s)/1000000LL)
+#define NSEC_OF_USEC(s)  (((s) % 1000000LL) * 1000)
+
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 #define __AT__  __FILE__ ":" TOSTRING(__LINE__)
