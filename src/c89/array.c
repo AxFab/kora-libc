@@ -72,14 +72,13 @@ void *bsearch(const void *key, const void *base, size_t nmemb, size_t size, int 
     while (nmemb > 0) {
         ptr = (char *)base + size * (nmemb / 2);
         sign = compar(key, ptr);
-        if (sign < 0) {
+        if (sign < 0)
             nmemb /= 2;
-        } else if (sign > 0) {
+        else if (sign > 0) {
             base = (char *)ptr + size;
             nmemb -= nmemb / 2 + 1;
-        } else {
+        } else
             return ptr;
-        }
     }
     return NULL;
 }

@@ -151,11 +151,11 @@ static const char state[]_I('z' + 1) = {
     },
 };
 
-static inline void pop_arg(format_arg_t *arg, int type, va_list ap)
+static inline va_list pop_arg(format_arg_t *arg, int type, va_list ap)
 {
     /* Give the compiler a hint for optimizing the switch. */
     if ((unsigned)type > MAXSTATE)
-        return;
+        return ap;
 
     switch (type) {
     case PTR:
@@ -219,6 +219,7 @@ static inline void pop_arg(format_arg_t *arg, int type, va_list ap)
         break;
 #endif
     }
+    return ap;
 }
 
 static inline int read_format_specifier(format_spec_t *sb, const char **ptr,
@@ -329,7 +330,7 @@ int _PRT(vfprintf)(FILE *fp, const char *str, va_list ap)
         if (sb.flag_ & LEFT_ADJ)
             sb.flag_ &= ~ZERO_PAD;
 
-        pop_arg(&arg, sb.type_, ap);
+        ap = pop_arg(&arg, sb.type_, ap);
         lg = 0;
 
         switch (str[-1]) {

@@ -61,7 +61,7 @@ struct lconv {
 };
 
 
-char *setlocale (int, const char *);
+char *setlocale(int, const char *);
 struct lconv *localeconv(void);
 
 __STDC_END

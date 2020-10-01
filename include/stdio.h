@@ -202,7 +202,7 @@ int fputs_unlocked(const char *str, FILE *stream);
 # define fgetpos64 fgetpos
 # define fsetpos64 fsetpos
 # define fpos64_t fpos_t
-# define off64_t off_t
+//# define off64_t off_t
 #endif
 
 

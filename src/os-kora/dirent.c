@@ -63,7 +63,7 @@ struct dirent *readdir(DIR *dir)
     }
     if (dir->len == 0)
         return NULL;
-    entry = (void*)(dir->buf + dir->pos);
+    entry = (void *)(dir->buf + dir->pos);
     dir->pos += entry->d_reclen;
     dir->cur = entry->d_off;
     return entry;

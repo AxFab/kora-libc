@@ -32,7 +32,7 @@ struct _IO_FILE {
     int lbuf_;
     int lock_;  /* -1: no lock */
     size_t count_;
-    size_t fpos_;
+    size_t fpos_; // TODO __off_t
 
     struct _IO_BUF rbf_;
     struct _IO_BUF wbf_;

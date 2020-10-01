@@ -51,7 +51,7 @@ int write(int fd, const void *buf, size_t lg)
 
 int lseek(int fd, __off_t offset, unsigned int origin)
 {
-    return -1;
+    return syscall(SYS_SEEK, fd, offset, origin);
 }
 
 int fcntl(int fd, int cmd, ...)
@@ -83,3 +83,11 @@ int pipe(int fds[2])
     return pipe2(fds, 0);
 }
 
+
+
+
+int remove(const char *path)
+{
+    return -1;
+    // return syscall(SYS_UNLINK, -1, path);
+}

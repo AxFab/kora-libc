@@ -149,11 +149,11 @@ void __libc_init()
 
 
 int file_stat_mode[] = { -1,
-    S_IFREG, S_IFBLK, S_IFIFO, S_IFCHR,
-    S_IFCHR, S_IFSOCK, S_IFLNK, S_IFREG,
-    S_IFCHR, S_IFCHR, S_IFDIR, S_IFDIR,
-    S_IFCHR, S_IFCHR
-    };
+                         S_IFREG, S_IFBLK, S_IFIFO, S_IFCHR,
+                         S_IFCHR, S_IFSOCK, S_IFLNK, S_IFREG,
+                         S_IFCHR, S_IFCHR, S_IFDIR, S_IFDIR,
+                         S_IFCHR, S_IFCHR
+                       };
 
 
 typedef struct filemeta filemeta_t;
@@ -190,6 +190,7 @@ int stat_(const char *path, int dir, struct stat *stat, int flags)
 
     // mode_t    st_mode;    /* protection */
     stat->st_mode = file_stat_mode[meta.ftype];
+    return 0;
 }
 
 
@@ -229,3 +230,14 @@ void gethostname(char *buf, int len)
 
 }
 
+char *getenv(const char *name)
+{
+    return NULL;
+}
+
+
+_Noreturn void abort(void)
+{
+    // raise(SIGABRT);
+    exit(127);
+}

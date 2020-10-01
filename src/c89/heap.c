@@ -151,7 +151,9 @@ void *_PRT(realloc)(void *ptr, size_t size)
 void _PRT(free)(void *ptr)
 {
     heap_arena_t *arena = find_arena((size_t)ptr); /* TODO bbtree GET */
-    assert(arena != NULL);
+    if (arena == NULL) {
+        assert(arena != NULL);
+    }
     if (arena->flags_ & HEAP_MAPPED) {
         assert((size_t)ptr == arena->address_);
         unmap((void *)arena->address_, arena->length_);

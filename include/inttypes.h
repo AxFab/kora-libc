@@ -25,7 +25,9 @@
 
 __STDC_GUARD
 
-typedef struct { intmax_t quot, rem; } imaxdiv_t;
+typedef struct {
+    intmax_t quot, rem;
+} imaxdiv_t;
 
 intmax_t imaxabs(intmax_t);
 imaxdiv_t imaxdiv(intmax_t, intmax_t);

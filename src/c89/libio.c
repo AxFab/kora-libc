@@ -22,6 +22,7 @@
 #include <errno.h>
 #include <bits/libio.h>
 #include <bits/crt.h>
+#include <kora/mcrs.h>
 
 /* Parse the character base mode for opening file and return binary mode
  * The mode parameter must start by on of this sequence:
@@ -98,24 +99,25 @@ int oflags(const char *mode)
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
 /* Flush a stream, ignoring lock */
-int fflush_unlocked(FILE *stream)
+int fflush_unlocked(FILE *fp)
 {
     /* If reading, sync position */
-    if (stream->rbf_.pos_ < stream->rbf_.end_)
-        stream->seek(stream, stream->rbf_.pos_ - stream->rbf_.end_, SEEK_CUR);
+    if (fp->rbf_.pos_ < fp->rbf_.end_)
+        fp->seek(fp, fp->rbf_.pos_ - fp->rbf_.end_, SEEK_CUR);
 
     /* If writing, flush output */
-    if (stream->wbf_.pos_ > stream->wbf_.base_) {
-        if (stream->write(stream, 0, 0) < 0)
+    if (fp->wbf_.pos_ > fp->wbf_.base_) {
+        if (fp->write(fp, 0, 0) < 0)
             return EOF;
     }
 
     /* Clear read and write modes */
-    stream->wbf_.pos_ = NULL;
-    stream->wbf_.base_ = NULL;
-    stream->wbf_.end_ = NULL;
-    stream->rbf_.pos_ = NULL;
-    stream->rbf_.end_ = NULL;
+    // stream->rbf_.pos_ = NULL;
+    // stream->rbf_.base_ = NULL;
+    // stream->rbf_.end_ = NULL;
+    // stream->wbf_.pos_ = NULL;
+    // stream->wbf_.base_ = NULL;
+    // stream->wbf_.end_ = NULL;
     return 0;
 }
 
@@ -139,23 +141,53 @@ int fflush(FILE *stream)
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
-static int _fread(FILE *stream, char *buf, size_t len)
+static int _fread(FILE *fp, char *buf, size_t len)
 {
     /* If unbuffered */
-    return read(stream->fd_, buf, len);
-    /* TODO */
+    if (fp->oflags_ & _IONBF)
+        return read(fp->fd_, buf, len);
+
+    if (fp->rbf_.base_ == NULL) {
+        fp->rbf_.base_ = malloc(512); // TODO BUFSZ
+        fp->rbf_.pos_ = fp->rbf_.base_;
+        fp->rbf_.end_ = fp->rbf_.pos_;
+    }
+
+    int bytes = 0;
+    while (len > 0) {
+        if (fp->rbf_.end_ == fp->rbf_.pos_) {
+            int rd = read(fp->fd_, fp->rbf_.base_, 512);
+            if (rd <= 0) {
+                free(fp->rbf_.base_);
+                fp->rbf_.base_ = NULL;
+                return bytes == 0 ? rd : bytes;
+            }
+            fp->rbf_.end_ = fp->rbf_.pos_ + rd;
+        }
+        int cap = MIN(len, fp->rbf_.end_ - fp->rbf_.pos_);
+        if (cap != 0)
+            memcpy(buf, fp->rbf_.pos_, cap);
+        buf += cap;
+        len -= cap;
+        bytes += cap;
+        fp->rbf_.pos_ += cap;
+    }
+
+    return bytes;
 }
 
-static int _fwrite(FILE *stream, const char *buf, size_t len)
+static int _fwrite(FILE *fp, const char *buf, size_t len)
 {
     /* If unbuffered */
-    return write(stream->fd_, buf, len);
+    if (fp->oflags_ & _IONBF)
+        return write(fp->fd_, buf, len);
     /* TODO */
+    return write(fp->fd_, buf, len);
 }
 
-static int _fseek(FILE *stream, long pos, int dir)
+static int _fseek(FILE *fp, long pos, int dir)
 {
-    return lseek(stream->fd_, pos, dir);
+    return lseek(fp->fd_, pos, dir);
 }
 
 
@@ -345,7 +377,17 @@ int fseek(FILE *stream, long offset, int whence)
 {
     int ret;
     FLOCK(stream);
+
+    /* Flush write buffer, and report error on failure. */
+
     ret = stream->seek(stream, offset, whence);
+    if (ret >= 0) {
+        stream->fpos_ = ret;
+        if (stream->rbf_.base_)
+            free(stream->rbf_.base_);
+        if (stream->wbf_.base_)
+            free(stream->wbf_.base_);
+    }
     FUNLOCK(stream);
     return ret;
 }
@@ -353,7 +395,19 @@ int fseek(FILE *stream, long offset, int whence)
 /* Reposition a stream */
 long ftell(FILE *stream)
 {
-    return (long)stream->fpos_;
+    size_t pos = stream->fpos_;
+
+    /* Adjust for data in buffer. */
+    if (stream->rbf_.base_)
+        pos += stream->rbf_.end_ -stream->rbf_.pos_;
+    if (stream->wbf_.base_)
+        pos += stream->wbf_.end_ -stream->wbf_.pos_;
+
+    // if (pos > LONG_MAX) {
+    //     errno = EOVERFLOW;
+    //     return -1;
+    // }
+    return (long)pos;
 }
 
 /* Reposition a stream */
@@ -448,14 +502,16 @@ char *fgets_unlocked(char *s, int size, FILE *stream)
         }
 
         *ps = (unsigned char)c;
-        if (c == '\n')
+        if (c == '\n') {
+            ++ps;
             break;
+        }
 
         ++ps;
     }
 
     *ps = '\0';
-    return ((void *)s == (void *)ps) ? (char *)EOF : s;
+    return ((void *)s == (void *)ps) ? NULL : s;
 }
 
 /* Read a character from STREAM. */
@@ -483,9 +539,9 @@ char *gets(char *s);
 char *fgets(char *s, int n, FILE *stream)
 {
     FLOCK(stream);
-    fgets_unlocked(s, n, stream);
+    char *r = fgets_unlocked(s, n, stream);
     FUNLOCK(stream);
-    return s;
+    return r;
 }
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */

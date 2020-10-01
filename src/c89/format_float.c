@@ -53,7 +53,7 @@ static long double _strtofx(const char *s, char **p, int bits, int emin)
 
     if (strnicmp(s, "infinity", 8) == 0) {
         if (p)
-            *p = (char*)(s + 8);
+            *p = (char *)(s + 8);
         return sign * INFINITY;
     } else if (strnicmp(s, "inf", 3) == 0) {
         if (p)
@@ -83,5 +83,10 @@ double strtod(const char *restrict s, char **restrict p)
 long double strtold(const char *restrict s, char **restrict p)
 {
     return _strtofx(s, p, LDBL_MANT_DIG, LDBL_MIN_EXP - LDBL_MANT_DIG);
+}
+
+double atof(const char *s)
+{
+    return _strtofx(s, NULL, DBL_MANT_DIG, DBL_MIN_EXP - DBL_MANT_DIG);
 }
 

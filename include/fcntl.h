@@ -10,6 +10,7 @@
 #include <bits/stat.h>
 #include <bits/libio.h>
 #include <bits/timespec.h>
+#include <sys/types.h>
 
 struct flock {
     short int l_type;
@@ -18,10 +19,6 @@ struct flock {
     __off_t l_len;
     __pid_t l_pid;
 };
-
-typedef __mode_t mode_t;
-typedef __off_t off_t;
-typedef __pid_t pid_t;
 
 
 int fcntl(int fd, int cmd, ...);

@@ -83,8 +83,8 @@ int isupper_l(int c, __locale_t l);
 int isxdigit_l(int c, __locale_t l);
 int isblank_l(int c, __locale_t l);
 
-int tolower_l (int c, __locale_t l);
-int toupper_l (int c, __locale_t l);
+int tolower_l(int c, __locale_t l);
+int toupper_l(int c, __locale_t l);
 
 #endif
 

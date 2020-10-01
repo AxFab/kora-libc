@@ -73,13 +73,19 @@ int __fpclassifyl(long double);
 
 static __inline unsigned __FLOAT_BITS(float __f)
 {
-    union {float __f; unsigned __i;} __u;
+    union {
+        float __f;
+        unsigned __i;
+    } __u;
     __u.__f = __f;
     return __u.__i;
 }
 static __inline unsigned long long __DOUBLE_BITS(double __f)
 {
-    union {double __f; unsigned long long __i;} __u;
+    union {
+        double __f;
+        unsigned long long __i;
+    } __u;
     __u.__f = __f;
     return __u.__i;
 }
@@ -324,8 +330,8 @@ float       scalbf(float, float);
 double      significand(double);
 float       significandf(float);
 
-double      lgamma_r(double, int*);
-float       lgammaf_r(float, int*);
+double      lgamma_r(double, int *);
+float       lgammaf_r(float, int *);
 
 float       j0f(float);
 float       j1f(float);
@@ -337,11 +343,11 @@ float       ynf(int, float);
 #endif
 
 #ifdef _GNU_SOURCE
-long double lgammal_r(long double, int*);
+long double lgammal_r(long double, int *);
 
-void        sincos(double, double*, double*);
-void        sincosf(float, float*, float*);
-void        sincosl(long double, long double*, long double*);
+void        sincos(double, double *, double *);
+void        sincosf(float, float *, float *);
+void        sincosl(long double, long double *, long double *);
 
 double      exp10(double);
 float       exp10f(float);
