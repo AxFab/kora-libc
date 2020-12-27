@@ -32,9 +32,6 @@
 # define static_assert _Static_assert
 #endif
 
-__STDC_GUARD
 
 _Noreturn void __assert_fail(const char *assertion, const char *file, unsigned line, const char *function);
-
-__STDC_END
 

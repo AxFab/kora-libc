@@ -18,7 +18,7 @@
  *   - - - - - - - - - - - - - - -
  */
 #include <string.h>
-#include <bits/crt.h>
+#include "stdc.h"
 
 
 static void memswap(void *a, void *b, void *t, size_t sz)

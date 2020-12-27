@@ -22,9 +22,14 @@
 
 #include <bits/cdefs.h>
 #include <bits/signum.h>
+#include <bits/types.h>
 
 __STDC_GUARD
 
+
+#define SIG_BLOCK     0
+#define SIG_UNBLOCK   1
+#define SIG_SETMASK   2
 
 typedef int sig_atomic_t;
 typedef void (*sighandler_t)(int);
@@ -33,6 +38,7 @@ typedef void (*sighandler_t)(int);
 #define SIG_ERR  ((void (*)(int))-1)
 #define SIG_IGN  ((void (*)(int)) 1)
 
+int kill(__pid_t, int);
 sighandler_t signal(int signum, sighandler_t handler);
 int raise(int);
 

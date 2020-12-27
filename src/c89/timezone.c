@@ -22,7 +22,7 @@
 #include <string.h>
 
 
-long __timezone = 0;
+long __tz_offset = 0;
 
 // char *timezone(const char *zone, int dst);
 
@@ -36,23 +36,21 @@ void tzset()
     // char *d_off = strtok(NULL, " ", &ptr);
     // char *d_start = strtok(NULL, " ", &ptr);
     // char *d_end = strtok(NULL, " ", &ptr);
-
 }
 
-struct tm *localtime_r(const time_t *restrict ptime, struct tm *restrict tp)
+
+struct tm *localtime_r(const time_t *restrict timep, struct tm *restrict tp)
 {
     tzset();
-    time_t ltime = *ptime;
-    ltime += __timezone;
+    time_t ltime = *timep;
+    ltime += __tz_offset;
     return gmtime_r(&ltime, tp);
 }
 
-struct tm *localtime(const time_t *ptime)
+struct tm *localtime(const time_t *timep)
 {
-    tzset();
-    time_t ltime = *ptime;
-    ltime += __timezone;
-    return gmtime(&ltime);
+    static struct tm tm;
+    return localtime_r(timep, &tm);
 }
 
 size_t strftime_(FILE *fp, const char *str, const struct tm *tm)
@@ -135,4 +133,14 @@ size_t strftime(char *buf, size_t len, const char *fmt, const struct tm *tm)
     return strftime_(&fp, fmt, tm);
 }
 
+time_t timelocal(struct tm *tm)
+{
+    time_t gmt = mktime(tm);
+    return gmt - __tz_offset;
+}
+
+time_t timegm(struct tm *tm)
+{
+    return mktime(tm);
+}
 

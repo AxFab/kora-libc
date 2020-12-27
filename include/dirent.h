@@ -30,15 +30,16 @@
 #include <bits/types.h>
 // #include <bits/posix1_lim.h>
 #include <stddef.h>
+#include <kernel/syscalls.h>
 
-struct dirent {
-    __ino_t d_ino;
-    __off_t d_off;
+// struct dirent {
+//     __ino_t d_ino;
+//     __off_t d_off;
 
-    unsigned short int d_reclen;
-    unsigned char d_type;
-    char d_name[256];
-};
+//     unsigned short int d_reclen;
+//     unsigned char d_type;
+//     char d_name[256];
+// };
 
 
 enum {

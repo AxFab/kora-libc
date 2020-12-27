@@ -5,7 +5,7 @@
 /* creates a mutex */
 int mtx_init(mtx_t *mutex, int type)
 {
-    atomic_init(&mutex->value, 0);
+    atomic_store(&mutex->value, 0);
     // check error, deadlocks chain, recursive
     return 0;
 }
@@ -27,7 +27,7 @@ int mtx_timedlock(mtx_t *restrict mutex, const struct timespec *restrict time_po
     /* spin and try to take lock */
     for (i = 0; i < 100; i++) {
         s = 0;
-        c = atomic_compare_exchange_strong(&mutex->value, &s, 1);
+        c = atomic_compare_exchange(&mutex->value, &s, 1);
         if (c)
             return 0;
         __asm_pause_;
@@ -37,9 +37,9 @@ int mtx_timedlock(mtx_t *restrict mutex, const struct timespec *restrict time_po
     if (s == 1)
         s = atomic_exchange(&mutex->value, 2);
 
-    tick_t start;
+    xtime_t start;
     if (time_point->tv_sec >= 0)
-        start = clock_read(CLOCK_MONOTONIC);
+        start = xtime_read(XTIME_CLOCK);
 
     while (s) {
         /* wait in the kernel */
@@ -47,8 +47,8 @@ int mtx_timedlock(mtx_t *restrict mutex, const struct timespec *restrict time_po
         s = atomic_exchange(&mutex->value, 2);
 
         if (time_point->tv_sec >= 0) {
-            tick_t now = clock_read(CLOCK_MONOTONIC);
-            tick_t elapsed = now - start;
+            xtime_t now = xtime_read(XTIME_CLOCK);
+            xtime_t elapsed = now - start;
             start = now;
             timeout -= (long)elapsed;
             if (timeout <= 0 || elapsed >= LONG_MAX)
@@ -65,7 +65,7 @@ int mtx_trylock(mtx_t *mutex)
     /* spin and try to take lock */
     for (i = 0; i < 100; i++) {
         s = 0;
-        c = atomic_compare_exchange_strong(&mutex->value, &s, 1);
+        c = atomic_compare_exchange(&mutex->value, &s, 1);
         if (c)
             return 0;
         __asm_pause_;
@@ -88,7 +88,7 @@ int mtx_unlock(mtx_t *mutex)
         if (mutex->value) {
             /* need to set to contended state in case there is waiters */
             s = 1;
-            c = atomic_compare_exchange_strong(&mutex->value, &s, 2);
+            c = atomic_compare_exchange(&mutex->value, &s, 2);
             if (c)
                 return 0;
         }

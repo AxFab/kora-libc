@@ -18,6 +18,7 @@ topdir ?= $(shell readlink -f $(dir $(word 1,$(MAKEFILE_LIST))))
 gendir ?= $(shell pwd)
 
 include $(topdir)/make/global.mk
+srcdir = $(topdir)/src
 
 all: libc crt0
 crt0: $(libdir)/crt0.o
@@ -26,23 +27,25 @@ install: $(prefix)/lib/libc.so $(prefix)/lib/crt0.o
 # 	$(V) cp -r $(topdir)/include $(prefix)/include
 # 	$(V) cp -r $(topdir)/arch/$(target_arch)/include $(prefix)/include/$(target_arch)-$(target_os)
 
-# Check exists $(srcdir)/src/os-$(target_os)?
-
 include $(topdir)/make/build.mk
 
-SRCS-y += $(wildcard $(srcdir)/src/c89/*.c)
-SRCS-y += $(wildcard $(srcdir)/src/c95/*.c)
-SRCS-y += $(wildcard $(srcdir)/src/c99/*.c)
-SRCS-y += $(wildcard $(srcdir)/src/c11/*.c)
-SRCS-y += $(wildcard $(srcdir)/src/os-$(target_os)/*.c)
+SRCS += $(wildcard $(srcdir)/c89/*.c)
+SRCS += $(wildcard $(srcdir)/c95/*.c)
+SRCS += $(wildcard $(srcdir)/c99/*.c)
+SRCS += $(wildcard $(srcdir)/c11/*.c)
 CFLAGS ?= -Wall -Wextra -Wno-unused-parameter -ggdb
-CFLAGS += -I$(srcdir)/include -fPIC -D_GNU_SOURCE
+CFLAGS += -ffreestanding
+# CFLAGS += -nostdinc
+CFLAGS += -I$(topdir)/include -fPIC
 
-include $(topdir)/arch/$(target_arch)/make.mk
+include $(topdir)/dist/$(target_arch)-${target_os}/make.mk
 
 $(eval $(call link_shared,c,SRCS,LFLAGS))
 
+r:
+	@echo ${SRCS}
+	@echo $(call fn_deps,SRCS)
 
 ifeq ($(NODEPS),)
-include $(call fn_deps,SRCS-y)
+include $(call fn_deps,SRCS)
 endif

@@ -53,8 +53,7 @@ static int _swrite(FILE *fp, const char *buf, size_t length)
 }
 
 /* Implementation of `vsnprintf` need to be inlined */
-static inline int _vsnprintf(char *str, size_t lg, const char *format,
-                             va_list ap)
+static inline int _vsnprintf(char *str, size_t lg, const char *format, va_list ap)
 {
     char b;
     int res;

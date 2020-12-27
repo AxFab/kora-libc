@@ -14,22 +14,11 @@ typedef __ssize_t ssize_t;
 typedef long fpos_t;
 
 
-#define EOF (-1)
-
-#define SEEK_SET 0
-#define SEEK_CUR 1
-#define SEEK_END 2
-
-#define _IOFBF 0
-#define _IOLBF 1
-#define _IONBF 2
-
 #define X_OK 1
 #define W_OK 2
 #define R_OK 4
 
 
-#define BUFSIZ 1024
 #define FILENAME_MAX 4096
 #define FOPEN_MAX 1000
 #define TMP_MAX 10000
@@ -45,7 +34,7 @@ FILE *freopen(const char *restrict filename, const char *restrict modes, FILE *r
 int fclose(FILE *stream);
 
 int remove(const char *filename);
-int rename(const char *old, const char *new);
+int rename(const char *oldpath, const char *newpath);
 
 
 
@@ -143,7 +132,7 @@ int putchar_unlocked(int c);
 
 __ssize_t getdelim(char **restrict lineptr, size_t *restrict n, int delimiter,  FILE *restrict stream);
 __ssize_t  getline(char **restrict lineptr, size_t *restrict n, FILE *restrict stream);
-int renameat(int oldfd, const char *old, int newfd, const char *new);
+int renameat(int oldfd, const char *oldpath, int newfd, const char *newpath);
 char *ctermid(char *s);
 
 #define L_ctermid 20

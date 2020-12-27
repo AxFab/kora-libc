@@ -3,7 +3,7 @@
 #define thread_local __declspec(thread)
 #define unlikely(c) c
 #define likely(c) c
-
+#define restrict __restrict
 #if WORDSIZE == 32
 #    define __ILP32
 #    define __ILPx

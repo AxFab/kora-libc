@@ -22,13 +22,11 @@
 #include <kora/splock.h>
 #include <kora/mcrs.h>
 #include <kora/syscalls.h>
-// #include <sys/mman.h>
+#include <sys/mman.h>
 #include <string.h>
 #include <errno.h>
 #include <time.h>
 #include <sys/stat.h>
-
-#define MMAP_HEAP 0x100
 
 _Noreturn void exit(int res);
 FILE *fvopen(int fd, int o);
@@ -36,11 +34,6 @@ void setup_allocator(void *, size_t);
 int snprintf(char *buf, size_t len, const char *msg, ...);
 int write(int fd, char *buf, size_t len);
 
-
-long long clock_read(int no)
-{
-    return -1;
-}
 
 int futex_wait(int *addr, int val, long timeout, int flags)
 {
@@ -62,12 +55,12 @@ int futex_wake(int *addr, int val)
 int chdir(const char *path)
 {
     int len = strlen(path) + 1;
-    return syscall(SYS_SINFO, 12/*SNFO_PWD*/, path, len);
+    return syscall(SYS_SINFO, SNFO_PWD, path, len);
 }
 
 char *getcwd(char *buf, size_t len)
 {
-    int ret = syscall(SYS_GINFO, 12/*SNFO_PWD*/, buf, len);
+    int ret = syscall(SYS_GINFO, SNFO_PWD, buf, len);
     return ret == 0 ? buf : NULL;
 }
 
@@ -137,7 +130,7 @@ _Noreturn void __assert(const char *expr, const char *file, int line)
 
 void __libc_init()
 {
-    void *heap = mmap(NULL, 16 * _Mib_, 06, MMAP_HEAP, -1, 0);
+    void *heap = mmap(NULL, 16 * _Mib_, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_HEAP, -1, 0);
     if (heap == NULL || heap == (void *) - 1)
         __perror_fail(ENOMEM, __FILE__, __LINE__, "Unable to allocate first heap segment");
     setup_allocator(heap, 16 * _Mib_);
@@ -217,7 +210,8 @@ void readlink()
 
 time_t time(time_t *ptr)
 {
-    return 0;
+    xtime_t now = xtime_read(XTIME_CLOCK);
+    return now / _PwMicro_;
 }
 
 clock_t clock()
@@ -241,3 +235,9 @@ _Noreturn void abort(void)
     // raise(SIGABRT);
     exit(127);
 }
+
+xtime_t xtime_read(xtime_name_t name)
+{
+    return 0;
+}
+

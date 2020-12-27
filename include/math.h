@@ -33,9 +33,13 @@ typedef long double decimal_t;
 #if 100*__GNUC__+__GNUC_MINOR__ >= 303
 #define NAN       __builtin_nanf("")
 #define INFINITY  __builtin_inff()
-#else
+#else 
+#define _HUGE_ENUF  1e+300
+#define INFINITY   ((float)(_HUGE_ENUF * _HUGE_ENUF))
+#define NAN        ((float)(INFINITY * 0.0F))
+/*#else 
 #define NAN       (0.0f/0.0f)
-#define INFINITY  1e5000f
+#define INFINITY  1e5000f*/
 #endif
 
 #define HUGE_VALF INFINITY
@@ -102,7 +106,7 @@ static __inline unsigned long long __DOUBLE_BITS(double __f)
 
 #define isnan(x) ( \
     sizeof(x) == sizeof(float) ? (__FLOAT_BITS(x) & 0x7fffffff) > 0x7f800000 : \
-    sizeof(x) == sizeof(double) ? (__DOUBLE_BITS(x) & -1ULL>>1) > 0x7ffULL<<52 : \
+    sizeof(x) == sizeof(double) ? (__DOUBLE_BITS(x) & ((unsigned long long)-1)>>1) > 0x7ffULL<<52 : \
     __fpclassifyl(x) == FP_NAN)
 
 #define isnormal(x) ( \
@@ -127,7 +131,7 @@ int __signbitl(long double);
 #define isunordered(x,y) (isnan((x)) ? ((void)(y),1) : isnan((y)))
 
 #define __ISREL_DEF(rel, op, type) \
-static __inline int __is##rel(type __x, type __y) \
+static inline int __is##rel(type __x, type __y) \
 { return !isunordered(__x,__y) && __x op __y; }
 
 __ISREL_DEF(lessf, <, float_t)
@@ -159,13 +163,6 @@ __ISREL_DEF(greaterequall, >=, long double)
 
 
 
-
-
-
-
-
-
-
 #define __DBL(n)  \
     double n(double); \
     float n ## f(float); \
@@ -182,6 +179,10 @@ __ISREL_DEF(greaterequall, >=, long double)
     double n(double, x); \
     float n ## f(float, x); \
     long double n ## l(long double, x);
+#define __DBLr(r,n)  \
+    r n(double); \
+    r n ## f(float); \
+    r n ## l(long double);
 
 
 __DBL(acos)
@@ -213,21 +214,13 @@ __DBLx(frexp, int *)
 
 __DBL2(hypot)
 
-int         ilogb(double);
-int         ilogbf(float);
-int         ilogbl(long double);
+__DBLr(int, ilogb)
 
 __DBLx(ldexp, int)
 __DBL(lgamma)
 
-
-long long   llrint(double);
-long long   llrintf(float);
-long long   llrintl(long double);
-
-long long   llround(double);
-long long   llroundf(float);
-long long   llroundl(long double);
+__DBLr(long long, llrint)
+__DBLr(long long, llround)
 
 __DBL(log)
 __DBL(log10)
@@ -235,14 +228,8 @@ __DBL(log1p)
 __DBL(log2)
 __DBL(logb)
 
-
-long        lrint(double);
-long        lrintf(float);
-long        lrintl(long double);
-
-long        lround(double);
-long        lroundf(float);
-long        lroundl(long double);
+__DBLr(long, lrint)
+__DBLr(long, lround)
 
 double      modf(double, double *);
 float       modff(float, float *);
@@ -255,10 +242,7 @@ long double nanl(const char *);
 __DBL(nearbyint)
 __DBL2(nextafter)
 
-
-double      nexttoward(double, long double);
-float       nexttowardf(float, long double);
-long double nexttowardl(long double, long double);
+__DBLx(nexttoward, long double)
 
 __DBL2(pow)
 __DBL2(remainder)

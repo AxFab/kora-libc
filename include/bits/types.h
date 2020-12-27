@@ -24,7 +24,9 @@
 #include <bits/cdefs.h>
 #include <stddef.h>
 
+#ifndef _NO_STATIC_ASSERT
 _Static_assert(sizeof(void *) == sizeof(size_t), "Unsupported, pointer and size_t must have the same size");
+#endif 
 
 // #include <bits/typesizes.h>
 
@@ -34,35 +36,100 @@ typedef unsigned int __u_int;
 typedef unsigned long int __u_long;
 
 /* Datatypes integer size */
+#ifndef __INT8_TYPE__
+
+#define __CHAR16_TYPE__ signed short
+#define __CHAR32_TYPE__ signed int
+#define __WCHAR_TYPE__ signed int
+
 #if defined __ILP32 || defined __LLP64
 
-typedef signed char __int8_t;
-typedef unsigned char __uint8_t;
-typedef signed short int __int16_t;
-typedef unsigned short int __uint16_t;
-typedef signed int __int32_t;
-typedef unsigned int __uint32_t;
-typedef signed long long int __int64_t;
-typedef unsigned long long int __uint64_t;
-typedef long long int __quad_t;
-typedef unsigned long long int __u_quad_t;
+#define __INT8_TYPE__ signed char
+#define __UINT8_TYPE__ unsigned char
+#define __INT16_TYPE__ signed short
+#define __UINT16_TYPE__ unsigned short
+#define __INT32_TYPE__ signed int
+#define __UINT32_TYPE__ unsigned int
+#define __INT64_TYPE__ signed long long
+#define __UINT64_TYPE__ unsigned long long
+
+#define __INT_LEAST8_TYPE__ signed char
+#define __UINT_LEAST8_TYPE__ unsigned char
+#define __INT_LEAST16_TYPE__ signed int
+#define __UINT_LEAST16_TYPE__ unsigned int
+#define __INT_LEAST32_TYPE__ signed int
+#define __UINT_LEAST32_TYPE__ unsigned int
+#define __INT_LEAST64_TYPE__ signed long long
+#define __UINT_LEAST64_TYPE__ unsigned long long
+
+#define __INT_FAST8_TYPE__ signed char
+#define __UINT_FAST8_TYPE__ unsigned char
+#define __INT_FAST16_TYPE__ signed int
+#define __UINT_FAST16_TYPE__ unsigned int
+#define __INT_FAST32_TYPE__ signed int
+#define __UINT_FAST32_TYPE__ unsigned int
+#define __INT_FAST64_TYPE__ signed long long
+#define __UINT_FAST64_TYPE__ unsigned long long
+
+#define __INTPTR_TYPE__ signed long
+#define __UINTPTR_TYPE__ unsigned long
+#define __INTMAX_TYPE__ signed long long
+#define __UINTMAX_TYPE__ unsigned long long
 
 #elif defined __LP64
 
-typedef signed char __int8_t;
-typedef unsigned char __uint8_t;
-typedef signed short int __int16_t;
-typedef unsigned short int __uint16_t;
-typedef signed int __int32_t;
-typedef unsigned int __uint32_t;
-typedef signed long int __int64_t;
-typedef unsigned long int __uint64_t;
-typedef long int __quad_t;
-typedef unsigned long int __u_quad_t;
+#define __INT8_TYPE__ signed char
+#define __UINT8_TYPE__ unsigned char
+#define __INT16_TYPE__ signed short
+#define __UINT16_TYPE__ unsigned short
+#define __INT32_TYPE__ signed int
+#define __UINT32_TYPE__ unsigned int
+#define __INT64_TYPE__ signed long
+#define __UINT64_TYPE__ unsigned long
+
+#define __INT_LEAST8_TYPE__ signed char
+#define __UINT_LEAST8_TYPE__ unsigned char
+#define __INT_LEAST16_TYPE__ signed int
+#define __UINT_LEAST16_TYPE__ unsigned int
+#define __INT_LEAST32_TYPE__ signed int
+#define __UINT_LEAST32_TYPE__ unsigned int
+#define __INT_LEAST64_TYPE__ signed long
+#define __UINT_LEAST64_TYPE__ unsigned long
+
+#define __INT_FAST8_TYPE__ signed char
+#define __UINT_FAST8_TYPE__ unsigned char
+#define __INT_FAST16_TYPE__ signed int
+#define __UINT_FAST16_TYPE__ unsigned int
+#define __INT_FAST32_TYPE__ signed int
+#define __UINT_FAST32_TYPE__ unsigned int
+#define __INT_FAST64_TYPE__ signed long
+#define __UINT_FAST64_TYPE__ unsigned long
+
+#define __INTPTR_TYPE__ signed long
+#define __UINTPTR_TYPE__ unsigned long
+#define __INTMAX_TYPE__ signed long
+#define __UINTMAX_TYPE__ unsigned long
+
+#else
+
+# error "Undefined architecture"
 
 #endif  /* Datatypes integer size */
 
+#endif /* __INT8_TYPE__ */
 
+typedef __INT8_TYPE__ __int8_t;
+typedef __UINT8_TYPE__ __uint8_t;
+typedef __INT16_TYPE__ __int16_t;
+typedef __UINT16_TYPE__ __uint16_t;
+typedef __INT32_TYPE__ __int32_t;
+typedef __UINT32_TYPE__ __uint32_t;
+typedef __INT64_TYPE__ __int64_t;
+typedef __UINT64_TYPE__ __uint64_t;
+typedef __INT64_TYPE__ __quad_t;
+typedef __UINT64_TYPE__ __u_quad_t;
+
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
 
 typedef unsigned long int __dev_t;
 typedef unsigned int __uid_t;
@@ -114,7 +181,7 @@ typedef long int __ssize_t;
 #endif  /* Datatypes pointer size */
 
 
-
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
 
 /* Datatypes 64 */
 #if defined __LP64

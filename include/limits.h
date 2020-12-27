@@ -22,6 +22,7 @@
 
 #include <bits/cdefs.h>
 #include <bits/posix_lim.h>
+#include <bits/limits_sys.h>
 
 #if '\xff' > 0
 #define CHAR_MIN 0
@@ -66,9 +67,39 @@
 
 
 
+#define NZERO 20
+
+
 
 #define MB_LEN_MAX 6
 
 #define PATH_MAX 4096
+
+
+/* Arbitrary numbers... */
+#define BC_BASE_MAX 99
+#define BC_DIM_MAX 2048
+#define BC_SCALE_MAX 99
+#define BC_STRING_MAX 1000
+#define CHARCLASS_NAME_MAX 14
+#define COLL_WEIGHTS_MAX 2
+#define EXPR_NEST_MAX 32
+#define LINE_MAX 4096
+#define RE_DUP_MAX 255
+
+// Maximum value of digit in calls to the printf() and scanf() functions.
+#define NL_ARGMAX 32767
+// Maximum number of bytes in a LANG name.
+#define NL_LANGMAX 32
+// Maximum message number.
+#define NL_MSGMAX 32767
+// Maximum number of bytes in an N - to - 1 collation mapping.
+#define NL_NMAX 16
+// Maximum set number.
+#define NL_SETMAX 255
+// Maximum number of bytes in a message string.
+#define NL_TEXTMAX 4096
+// Default process priority.
+
 
 #endif  /* __LIMITS_H */

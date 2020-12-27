@@ -1,7 +1,26 @@
+/*
+ *      This file is part of the KoraOS project.
+ *  Copyright (C) 2015-2019  <Fabien Bavent>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *   - - - - - - - - - - - - - - -
+ */
 #ifndef __SYS_TYPES_H
 #define __SYS_TYPES_H 1
 
-#include <bits/types.h>
+#include <sys/types.h>
 
 typedef __u_char u_char;
 typedef __u_short u_short;
@@ -9,14 +28,6 @@ typedef __u_int u_int;
 typedef __u_long u_long;
 
 
-typedef __int8_t int8_t;
-typedef __uint8_t uint8_t;
-typedef __int16_t int16_t;
-typedef __uint16_t uint16_t;
-typedef __int32_t int32_t;
-typedef __uint32_t uint32_t;
-typedef __int64_t int64_t;
-typedef __uint64_t uint64_t;
 typedef __quad_t quad_t;
 typedef __u_quad_t u_quad_t;
 
@@ -53,7 +64,6 @@ typedef __qaddr_t qaddr_t;
 typedef __fsword_t fsword_t;
 typedef __syscall_slong_t syscall_slong_t;
 typedef __syscall_ulong_t syscall_ulong_t;
-typedef __intptr_t intptr_t;
 typedef __ssize_t ssize_t;
 
 

@@ -21,7 +21,7 @@
 #include <string.h>
 #include <errno.h>
 #include <bits/libio.h>
-#include <bits/crt.h>
+#include "stdc.h"
 #include <kora/mcrs.h>
 
 /* Parse the character base mode for opening file and return binary mode
@@ -164,7 +164,7 @@ static int _fread(FILE *fp, char *buf, size_t len)
             }
             fp->rbf_.end_ = fp->rbf_.pos_ + rd;
         }
-        int cap = MIN(len, fp->rbf_.end_ - fp->rbf_.pos_);
+        int cap = MIN(len, (size_t)(fp->rbf_.end_ - fp->rbf_.pos_));
         if (cap != 0)
             memcpy(buf, fp->rbf_.pos_, cap);
         buf += cap;
@@ -399,9 +399,9 @@ long ftell(FILE *stream)
 
     /* Adjust for data in buffer. */
     if (stream->rbf_.base_)
-        pos += stream->rbf_.end_ -stream->rbf_.pos_;
+        pos += stream->rbf_.end_ - stream->rbf_.pos_;
     if (stream->wbf_.base_)
-        pos += stream->wbf_.end_ -stream->wbf_.pos_;
+        pos += stream->wbf_.end_ - stream->wbf_.pos_;
 
     // if (pos > LONG_MAX) {
     //     errno = EOVERFLOW;

@@ -20,12 +20,18 @@
 #include <string.h>
 #include <errno.h>
 #include "allocator.h"
+#include <assert.h>
+#include <sys/mman.h>
+
+#ifndef MAP_HEAP
+#define MAP_HEAP 0
+#endif
 
 #if defined KORA_KRN
 #else
-void *mmap(void *, size_t, int, int, int, int);
-void munmap(void *, size_t);
-#define mmap(s) mmap(NULL, s, 6, 0x100, -1, 0);
+void *mmap(void *, size_t, int, int, int, __off_t);
+int munmap(void *, size_t);
+#define mmap(s) mmap(NULL, s, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_HEAP, -1, 0);
 #define unmap(a,s) munmap((void*)a, s);
 #endif
 
@@ -151,9 +157,8 @@ void *_PRT(realloc)(void *ptr, size_t size)
 void _PRT(free)(void *ptr)
 {
     heap_arena_t *arena = find_arena((size_t)ptr); /* TODO bbtree GET */
-    if (arena == NULL) {
+    if (arena == NULL)
         assert(arena != NULL);
-    }
     if (arena->flags_ & HEAP_MAPPED) {
         assert((size_t)ptr == arena->address_);
         unmap((void *)arena->address_, arena->length_);

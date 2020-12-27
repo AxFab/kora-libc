@@ -22,51 +22,52 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <kernel/syscalls.h>
 
-#define SYS_POWER  12
-#define SYS_SCALL  13
-#define SYS_SYSLOG  14
-#define SYS_GINFO  25
-#define SYS_SINFO  26
+// #define SYS_POWER  12
+// #define SYS_SCALL  13
+// #define SYS_SYSLOG  14
+// #define SYS_GINFO  25
+// #define SYS_SINFO  26
 
-#define SYS_YIELD  0
-#define SYS_EXIT  1
-#define SYS_WAIT  2
-#define SYS_EXEC  11
-#define SYS_CLONE  21
+// #define SYS_YIELD  0
+// #define SYS_EXIT  1
+// #define SYS_WAIT  2
+// #define SYS_EXEC  11
+// #define SYS_CLONE  21
 
-#define SYS_SIGRAISE  15
-#define SYS_SIGACTION  16
-#define SYS_SIGRETURN  17
+// #define SYS_SIGRAISE  15
+// #define SYS_SIGACTION  16
+// #define SYS_SIGRETURN  17
 
-#define SYS_MMAP  3
-#define SYS_MUNMAP  4
-#define SYS_MPROTECT  5
+// #define SYS_MMAP  3
+// #define SYS_MUNMAP  4
+// #define SYS_MPROTECT  5
 
-#define SYS_ACCESS 33
-#define SYS_OPEN  6
-#define SYS_CLOSE  7
-#define SYS_READ  8
-#define SYS_WRITE  9
-#define SYS_SEEK  10
-#define SYS_READDIR  33
+// #define SYS_ACCESS 33
+// #define SYS_OPEN  6
+// #define SYS_CLOSE  7
+// #define SYS_READ  8
+// #define SYS_WRITE  9
+// #define SYS_SEEK  10
+// #define SYS_READDIR  33
 
-#define SYS_WINDOW  18
-#define SYS_PIPE  19
-#define SYS_FCNTL  20
-#define SYS_FSTAT  24
+// #define SYS_WINDOW  18
+// #define SYS_PIPE  19
+// #define SYS_FCNTL  20
+// #define SYS_FSTAT  24
 
-#define SYS_FUTEX_WAIT 22
-#define SYS_FUTEX_REQUEUE 23
+// #define SYS_FUTEX_WAIT 22
+// #define SYS_FUTEX_REQUEUE 23
 
 
-#define SYS_START 31
-#define SYS_STOP 32
+// #define SYS_START 31
+// #define SYS_STOP 32
 
-#define SYS_SLEEP 30
-#define SYS_SFORK 27
-#define SYS_PFORK 28
-#define SYS_TFORK 29
+// #define SYS_SLEEP 30
+// #define SYS_SFORK 27
+// #define SYS_PFORK 28
+// #define SYS_TFORK 29
 
 
 
@@ -77,25 +78,25 @@
 //    size_t length;
 //};
 
-struct image {
-    int width, height, pitch, format;
-};
+// struct image {
+//     int width, height, pitch, format;
+// };
 
 
-struct filemeta {
-    int ino;
-    int dev;
-    int block;
-    int ftype;
+// struct filemeta {
+//     int ino;
+//     int dev;
+//     int block;
+//     int ftype;
 
-    int64_t size;
-    int64_t rsize;
+//     int64_t size;
+//     int64_t rsize;
 
-    uint64_t ctime;
-    uint64_t mtime;
-    uint64_t atime;
-    uint64_t btime;
-};
+//     uint64_t ctime;
+//     uint64_t mtime;
+//     uint64_t atime;
+//     uint64_t btime;
+// };
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
 

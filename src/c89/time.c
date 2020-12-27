@@ -237,20 +237,44 @@ static int __secstotm(long long timestamp, struct tm *tm)
     return 0;
 }
 
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
 
-// FIXME use local
-char *asctime_r(const struct tm *date, char *str)
+char *asctime_r(const struct tm *date, char *buf)
 {
     // assert(date->tm_wday >= 0 && date->tm_wday < 7);
     // assert(date->tm_mon >= 0 && date->tm_mon < 12);
-    snprintf(str, 26, "%.3s %.3s %2d %.2d:%.2d:%.2d %d\n",
+    snprintf(buf, 26, "%.3s %.3s %2d %.2d:%.2d:%.2d %d\n",
              shWeekDayStrings[date->tm_wday % 7], shMonthStrings[date->tm_mon % 12],
              date->tm_mday, date->tm_hour,
              date->tm_min, date->tm_sec,
              1900 + date->tm_year);
-    return str;
+    return buf;
 }
 
+char *ctime_r(const time_t *timep, char *buf)
+{
+    struct tm tm;
+    gmtime_r(timep, &tm);
+    return asctime_r(&tm, buf);
+}
+
+struct tm *gmtime_r(const time_t *time, struct tm *result)
+{
+    if (__secstotm(*time, result) < 0) {
+        errno = EOVERFLOW;
+        return 0;
+    }
+    result->tm_isdst = 0;
+    // result->__tm_gmtoff = 0;
+    // result->__tm_zone = __gmt;
+    return result;
+}
+
+// struct tm *localtime_r(const time_t *timep, struct tm *result)
+// {
+//     time_t local = *timep + 0; // TODO - Find timezone offset
+//     return gmtime_r(&local, result);
+// }
 
 char *asctime(const struct tm *date)
 {
@@ -258,7 +282,25 @@ char *asctime(const struct tm *date)
     return asctime_r(date, buf);
 }
 
-time_t timegm(struct tm *tm)
+char *ctime(const time_t *timep)
+{
+    static char buf[30];
+    return ctime_r(timep, buf);
+}
+
+struct tm *gmtime(const time_t *time)
+{
+    static struct tm tm;
+    return gmtime_r(time, &tm);
+}
+
+// struct tm *localtime(const time_t *timep)
+// {
+//     static struct tm tm;
+//     return localtime_r(time, &tm);
+// }
+
+time_t mktime(struct tm *tm)
 {
     struct tm datetime;
     long long t = __tmtosecs(tm);
@@ -272,28 +314,3 @@ time_t timegm(struct tm *tm)
     tm->tm_isdst = 0;
     return t;
 }
-
-time_t mktime(struct tm *tm)
-{
-    return timegm(tm);
-}
-
-
-struct tm *gmtime_r(const time_t *time, struct tm *tm)
-{
-    if (__secstotm(*time, tm) < 0) {
-        errno = EOVERFLOW;
-        return 0;
-    }
-    tm->tm_isdst = 0;
-    // tm->__tm_gmtoff = 0;
-    // tm->__tm_zone = __gmt;
-    return tm;
-}
-
-struct tm *gmtime(const time_t *time)
-{
-    static struct tm tm;
-    return gmtime_r(time, &tm);
-}
-

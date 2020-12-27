@@ -1,9 +1,30 @@
+/*
+ *      This file is part of the KoraOS project.
+ *  Copyright (C) 2015-2019  <Fabien Bavent>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *   - - - - - - - - - - - - - - -
+ */
 #ifndef __BITS_CDEFS_H
 #define __BITS_CDEFS_H 1
 
+#ifndef _NO_STATIC_ASSERT
 _Static_assert(sizeof(short) == 2, "Unsupported, short must be 16 bits");
 _Static_assert(sizeof(int) == 4, "Unsupported, int must be 32 bits");
-_Static_assert(sizeof(long long) == 8, "Unsupported, short must be 64 bits");
+_Static_assert(sizeof(long long) == 8, "Unsupported, long long must be 64 bits");
+#endif
 
 /* Guess compiler and architecture */
 #if defined __amd64 || defined __x86_64
@@ -74,8 +95,11 @@ _Static_assert(sizeof(long long) == 8, "Unsupported, short must be 64 bits");
 
 
 
-
 /* Define specification level */
+#if defined __GNUC__ && !defined __STRICT_ANSI__ && !defined _GNU_SOURCE
+# define _GNU_SOURCE
+#endif
+
 #if defined _GNU_SOURCE
 # define __GNU
 # define __UNIX
@@ -89,10 +113,10 @@ _Static_assert(sizeof(long long) == 8, "Unsupported, short must be 64 bits");
 
 
 #if __STDC_VERSION__ >= 201112L
-# define __C11  /* Ename ISO C11 extention */
+# define __C11  /* Enable ISO C11 extention */
 #endif
 #if __STDC_VERSION__ >= 199901L || defined __cplusplus || defined __C11
-# define __C99  /* Ename ISO C99 extention */
+# define __C99  /* Enable ISO C99 extention */
 #endif
 
 #if __STDC_VERSION__ >= 199409L || defined __C99

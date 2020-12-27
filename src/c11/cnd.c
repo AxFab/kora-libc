@@ -4,11 +4,12 @@
 #include <errno.h>
 #include "futex.h"
 
+
 /* creates a condition variable */
 int cnd_init(cnd_t *cond)
 {
     cond->mtx = NULL;
-    atomic_init(&cond->seq, 0);
+    atomic_store(&cond->seq, 0);
     return 0;
 }
 
@@ -53,14 +54,14 @@ int cnd_timedwait(cnd_t *restrict cond, mtx_t *restrict mutex, const struct time
             return EINVAL;
         /* atomically set mutex inside cond */
         intptr_t ptr = 0;
-        atomic_compare_exchange_strong((atomic_intptr_t *)&cond->mtx, &ptr, (intptr_t)mutex);
+        atomic_ptr_compare_exchange(&cond->mtx, &ptr, mutex);
         if (cond->mtx != mutex)
             return EINVAL;
     }
 
-    tick_t start;
+    xtime_t start;
     if (time_point->tv_sec >= 0)
-        start = clock_read(CLOCK_MONOTONIC);
+        start = xtime_read(XTIME_CLOCK);
 
     mtx_unlock(mutex);
     futex_wait((int *)&cond->seq, seq, timeout, cond->flags);
@@ -68,8 +69,8 @@ int cnd_timedwait(cnd_t *restrict cond, mtx_t *restrict mutex, const struct time
         futex_wait((int *)&mutex->value, 2, timeout, mutex->flags);
 
         if (time_point->tv_sec >= 0) {
-            tick_t now = clock_read(CLOCK_MONOTONIC);
-            tick_t elapsed = now - start;
+            xtime_t now = xtime_read(XTIME_CLOCK);
+            xtime_t elapsed = now - start;
             start = now;
             timeout -= (long)elapsed;
             if (timeout <= 0 || elapsed >= LONG_MAX)
@@ -85,3 +86,4 @@ void cnd_destroy(cnd_t *cond)
 {
     (void)cond;
 }
+

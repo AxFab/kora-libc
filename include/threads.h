@@ -1,7 +1,7 @@
 #ifndef __THREADS_H
 #define __THREADS_H 1
 
-#include <stdatomic.h>
+#include <kora/atomic.h>
 #include <time.h>
 
 #define ONCE_FLAG_INIT {0}
@@ -40,7 +40,7 @@ struct mtx {
 };
 
 struct cnd {
-    mtx_t *mtx;
+    atomic_ptr mtx;
     atomic_int seq;
     int flags;
 };

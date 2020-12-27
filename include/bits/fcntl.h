@@ -17,23 +17,48 @@
  *
  *   - - - - - - - - - - - - - - -
  */
-#ifndef __ISO646_H
-#define __ISO646_H 1
-
-#ifndef __cplusplus
-
-#define and    &&
-#define and_eq &=
-#define bitand &
-#define bitor  |
-#define compl  ~
-#define not    !
-#define not_eq !=
-#define or     ||
-#define or_eq  |=
-#define xor    ^
-#define xor_eq ^=
-
+#if !defined __FCNTL_H
+# error "Never use <bits/fcntl.h> directly; include <fcntl.h> instead."
 #endif
 
-#endif  /* __ISO646_H */
+#include <bits/io.h>
+
+#define F_DUPFD  0
+#define F_GETFD  1
+#define F_SETFD  2
+#define F_GETFL  3
+#define F_SETFL  4
+
+#define F_SETOWN 8
+#define F_GETOWN 9
+#define F_SETSIG 10
+#define F_GETSIG 11
+
+#define F_GETLK 12
+#define F_SETLK 13
+#define F_SETLKW 14
+
+#define F_SETOWN_EX 15
+#define F_GETOWN_EX 16
+
+#define F_GETOWNER_UIDS 17
+
+#define F_OFD_GETLK 36
+#define F_OFD_SETLK 37
+#define F_OFD_SETLKW 38
+
+#define F_DUPFD_CLOEXEC 1030
+
+#define F_RDLCK 0
+#define F_WRLCK 1
+#define F_UNLCK 2
+
+#define FD_CLOEXEC 1
+
+#define AT_FDCWD (-100)
+#define AT_SYMLINK_NOFOLLOW 0x100
+#define AT_REMOVEDIR 0x200
+#define AT_SYMLINK_FOLLOW 0x400
+#define AT_EACCESS 0x200
+
+

@@ -23,20 +23,19 @@
 #include <threads.h>
 #include <time.h>
 #include <kora/splock.h>
+#include <kora/atomic.h>
+#include <kora/time.h>
 
 #define FUTEX_PRIORITY  1
 #define FUTEX_REALTIME  2
 #define FUTEX_SHARED  4
 #define FUTEX_CREATE  8
 
-typedef long long tick_t;
-
 int futex_wait(int *addr, int val, long timeout, int flags);
 int futex_wake(int *addr, int val);
 int futex_requeue(int *addr, int val, int val2, int *addr2, int flags);
-tick_t futex_tick();
 void futex_init();
 
-tick_t clock_read(int no);
+
 
 #endif /* _KORA_FUTEX_H */
