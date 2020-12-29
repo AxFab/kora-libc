@@ -1,7 +1,7 @@
 use32
 
 global _start
-extern __libc_init, _main, exit
+extern __libc_init, __libc_fini, _main, exit
 extern _GLOBAL_OFFSET_TABLE_
 
 %macro  get_GOT 0
@@ -31,6 +31,10 @@ _start:
     mov [esp + 8], eax
     call _main
     mov [esp], eax
+
+    get_GOT
+    mov eax,[ebx + __libc_fini wrt ..got]
+    call eax
 
     get_GOT
     mov eax,[ebx + exit wrt ..got]

@@ -37,7 +37,8 @@ int write(int fd, char *buf, size_t len);
 
 int futex_wait(int *addr, int val, long timeout, int flags)
 {
-    return syscall(SYS_FUTEX_WAIT, addr, val, timeout, flags);
+    xtime_t time = timeout;
+    return syscall(SYS_FUTEX_WAIT, addr, val, &time, flags);
 }
 
 int futex_requeue(int *addr, int val, int val2, int *addr2, int flags)
@@ -140,12 +141,18 @@ void __libc_init()
     stderr = fvopen(2, O_WRONLY);
 }
 
+void __libc_fini()
+{
+    fclose(stdin);
+    fclose(stdout);
+    fclose(stderr);
+}
+
 
 int file_stat_mode[] = { -1,
                          S_IFREG, S_IFBLK, S_IFIFO, S_IFCHR,
                          S_IFCHR, S_IFSOCK, S_IFLNK, S_IFREG,
-                         S_IFCHR, S_IFCHR, S_IFDIR, S_IFDIR,
-                         S_IFCHR, S_IFCHR
+                         S_IFDIR,
                        };
 
 
@@ -238,6 +245,8 @@ _Noreturn void abort(void)
 
 xtime_t xtime_read(xtime_name_t name)
 {
-    return 0;
+    xtime_t value = 0;
+    syscall(SYS_XTIME, name, &value);
+    return value;
 }
 

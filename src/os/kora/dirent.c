@@ -12,7 +12,7 @@ struct __dirstream {
     char buf[0];
 };
 
-#define DIRSTREAM_BUF_SIZE 2048
+#define DIRSTREAM_BUF_SIZE sizeof(struct dirent)
 
 
 int dirfd(DIR *dir)
