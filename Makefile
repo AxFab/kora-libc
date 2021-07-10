@@ -64,22 +64,24 @@ CFLAGS += -fprofile-arcs -ftest-coverage
 LFLAGS += -coverage
 endif
 
-
 $(gendir)/lib/libc.a:
 	$(V) ar -rc $@ $(call fn_objs,SRCS)
 
 SRCS_ck += ${SRCS}
 SRCS_ck += $(wildcard $(srcdir)/tests/*.c)
 
-CHECKS += cklc
 
 $(eval $(call link_shared,c,SRCS,LFLAGS))
 $(eval $(call link_bin,cklc,SRCS_ck,LFLAGS))
+
+CHECKS += cklc
 
 e_dist:
 	@echo $(target_arch)-$(target_os)
 e_srcs:
 	@echo $(SRCS)
+
+check: $(patsubst %,val_%,$(CHECKS))
 
 ifeq ($(NODEPS),)
 include $(call fn_deps,SRCS)

@@ -78,6 +78,7 @@ static inline int ck_run(Suite *s)
             fprintf(stderr, "  - Test %-32s  [\e[31mFAILS\e[0m]\n", ts->name);
             s->fails++;
         }
+        free(ts);
     }
     if (s->fails == 0)
         fprintf(stderr, "Run successfully  %d success, %d cases\n", s->success, s->cases);
