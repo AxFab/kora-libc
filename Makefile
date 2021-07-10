@@ -53,9 +53,7 @@ CFLAGS += -I$(srcdir)/include/$(target_arch)-$(target_os)
 LFLAGS += -lgcc
 
 -include $(srcdir)/arch/$(target_arch)/make.mk
-
 # -include $(srcdir)/os/$(target_os)/make.mk
-# -include $(topdir)/dist/$(target_arch)-$(target_os)/make.mk
 
 # SRCS_ck += ${SRCS}
 SRCS_ck += $(wildcard $(srcdir)/convert/*.c)
