@@ -20,22 +20,19 @@
 #ifndef __ENDIAN_H
 #define __ENDIAN_H 1
 
+
+#include <bits/cdefs.h>
+#include <byteswap.h>
+
 #define __LITTLE_ENDIAN 1234
 #define __BIG_ENDIAN 4321
 #define __PDP_ENDIAN 3412
-
-#include <bits/endian.h>
 
 #define BIG_ENDIAN __BIG_ENDIAN
 #define LITTLE_ENDIAN __LITTLE_ENDIAN
 #define PDP_ENDIAN __PDP_ENDIAN
 #define BYTE_ORDER __BYTE_ORDER
 
-#include <stdint.h>
-
-#define __bswap16(w) ((uint16_t)((((w) & 0xFF00) >> 8) | (((w) & 0xFF) << 8)))
-#define __bswap32(l) ((uint32_t)((((l) & 0xFF000000) >> 24) | (((l) & 0xFF0000) >> 8) | (((l) & 0xFF00) << 8) | (((l) & 0xFF) << 24)))
-#define __bswap64(q) (__bswap32((uint64_t)(q))+0ULL<<32|__bswap32((uint64_t)(q)>>32))
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 #define htobe16(x) __bswap16(x)

@@ -20,31 +20,59 @@ gendir ?= $(shell pwd)
 include $(topdir)/make/global.mk
 srcdir = $(topdir)/src
 
-all: libc crt0
-crt0: $(libdir)/crt0.o
+all: libc $(gendir)/lib/libc.a
+# 	crt0
+# crt0: $(libdir)/crt0.o
 install: $(prefix)/lib/libc.so $(prefix)/lib/crt0.o
 # install-headers:
 # 	$(V) cp -r $(topdir)/include $(prefix)/include
 # 	$(V) cp -r $(topdir)/arch/$(target_arch)/include $(prefix)/include/$(target_arch)-$(target_os)
 
 include $(topdir)/make/build.mk
+include $(topdir)/make/check.mk
 
 SRCS += $(wildcard $(srcdir)/c89/*.c)
-SRCS += $(wildcard $(srcdir)/c95/*.c)
-SRCS += $(wildcard $(srcdir)/c99/*.c)
-SRCS += $(wildcard $(srcdir)/c11/*.c)
-CFLAGS ?= -Wall -Wextra -Wno-unused-parameter -ggdb
-CFLAGS += -ffreestanding
-# CFLAGS += -nostdinc
-CFLAGS += -I$(topdir)/include -fPIC
+SRCS += $(wildcard $(srcdir)/convert/*.c)
+SRCS += $(wildcard $(srcdir)/libio/*.c)
+SRCS += $(wildcard $(srcdir)/misc/*.c)
+SRCS += $(wildcard $(srcdir)/posix/*.c)
+SRCS += $(wildcard $(srcdir)/string/*.c)
+SRCS += $(wildcard $(srcdir)/synchro/*.c)
+SRCS += $(wildcard $(srcdir)/xopen/*.c)
 
-include $(topdir)/dist/$(target_arch)-${target_os}/make.mk
+SRCS += $(wildcard $(srcdir)/os/$(target_os)/*.c)
+SRCS += $(wildcard $(srcdir)/os/$(target_os)/$(target_arch)/*.$(ASM_EXT))
+
+CFLAGS ?= -Wall -Wextra -Wno-unused-parameter -ggdb
+CFLAGS += -ffreestanding -fPIC
+CFLAGS += -I$(topdir)/include
+CFLAGS += -I$(srcdir)/include/$(target_arch)
+CFLAGS += -I$(srcdir)/include/$(target_os)
+CFLAGS += -I$(srcdir)/include/$(target_arch)-$(target_os)
+
+LFLAGS += -lgcc
+
+-include $(srcdir)/arch/$(target_arch)/make.mk
+
+# -include $(srcdir)/os/$(target_os)/make.mk
+# -include $(topdir)/dist/$(target_arch)-$(target_os)/make.mk
+
+# SRCS_ck += ${SRCS}
+SRCS_ck += $(wildcard $(srcdir)/convert/*.c)
+SRCS_ck += $(wildcard $(srcdir)/tests/*.c)
+
+$(gendir)/lib/libc.a:
+	$(V) ar -rc $@ $(call fn_objs,SRCS)
+
+CHECKS += ck_libc
 
 $(eval $(call link_shared,c,SRCS,LFLAGS))
+$(eval $(call link_bin,ck_libc,SRCS_ck,LFLAGS))
 
-r:
-	@echo ${SRCS}
-	@echo $(call fn_deps,SRCS)
+e_dist:
+	@echo $(target_arch)-$(target_os)
+e_srcs:
+	@echo $(SRCS)
 
 ifeq ($(NODEPS),)
 include $(call fn_deps,SRCS)

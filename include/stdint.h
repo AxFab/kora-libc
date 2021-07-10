@@ -17,7 +17,7 @@
  *
  *   - - - - - - - - - - - - - - -
  */
-#ifndef __STDINT_H 
+#ifndef __STDINT_H
 #define __STDINT_H 1
 
 #include <bits/cdefs.h>

@@ -24,6 +24,7 @@
 #include <stddef.h>
 #include <stdarg.h>
 #include <bits/io.h>
+#include <bits/atomic.h>
 
 #define EOF (-1)
 #define BUFSIZ 512
@@ -32,8 +33,13 @@
 #define _IOLBF 1
 #define _IONBF 2
 
-#define FF_EOF  (1 << 1)
-#define FF_ERR  (1 << 2)
+#define F_PERM 1
+#define F_NORD 4
+#define F_NOWR 8
+#define F_EOF 16
+#define F_ERR 32
+#define F_SVB 64
+#define F_APP 128
 
 
 typedef long fpos_t;
@@ -51,10 +57,11 @@ struct _IO_BUF {
 
 struct _IO_FILE {
     int fd_;
+    int mode;
     int oflags_;
     int flags_;
     int lbuf_;
-    int lock_;  /* -1: no lock */
+    atomic_int lock_;  /* -1: no lock */
     size_t count_;
     size_t fpos_; // TODO __off_t
 
@@ -77,53 +84,31 @@ extern struct _IO_FILE *stderr;
 #define R_OK 4
 #define W_OK 2
 #define X_OK 1
-#define F_PERM 7
 
 
-#define FLOCK(f) ((void)0)
-#define FUNLOCK(f) ((void)0)
-#define FRMLOCK(f) ((void)0)
-
-/*
-typedef __ssize_t __io_read_fn (void *__cookie, char *__buf, size_t __nbytes);
-
-typedef __ssize_t __io_write_fn (void *__cookie, const char *__buf,
-     size_t __n);
-
-typedef int __io_seek_fn (void *__cookie, __off64_t *__pos, int __w);
-typedef int __io_close_fn (void *__cookie);
-
-extern int __underflow (_IO_FILE *);
-extern int __uflow (_IO_FILE *);
-extern int __overflow (_IO_FILE *, int);
-
-extern int _IO_getc (_IO_FILE *__fp);
-extern int _IO_putc (int __c, _IO_FILE *__fp);
-extern int _IO_feof (_IO_FILE *__fp) __attribute__ ((__nothrow__ , __leaf__));
-extern int _IO_ferror (_IO_FILE *__fp) __attribute__ ((__nothrow__ , __leaf__));
-
-extern int _IO_peekc_locked (_IO_FILE *__fp);
+#define FLOCK(f)  __lock(&(f)->lock_)
+#define FUNLOCK(f) __unlock(&(f)->lock_)
+#define FRMLOCK(f) __lock(&(f)->lock_)
 
 
+void __fstr_open_rw(FILE *fp, void *buf, int len);
+void __fstr_open_ro(FILE *fp, const void *buf, int len);
+
+int __fgets_ifeqi(FILE *fp, const char *str);
+
+int fgetc_unlocked(FILE *fp);
+int fputc_unlocked(int c, FILE *fp);
+int fflush_unlocked(FILE *fp);
+int ungetc_unlocked(int c, FILE *fp);
 
 
+size_t fread_unlocked(void *restrict ptr, size_t size, size_t n, FILE *restrict fp);
+size_t fwrite_unlocked(const void *restrict ptr, size_t size,  size_t n, FILE *restrict fp);
 
-extern void _IO_flockfile (_IO_FILE *) __attribute__ ((__nothrow__ , __leaf__));
-extern void _IO_funlockfile (_IO_FILE *) __attribute__ ((__nothrow__ , __leaf__));
-extern int _IO_ftrylockfile (_IO_FILE *) __attribute__ ((__nothrow__ , __leaf__));
+void clearerr(FILE *fp);
+int feof(FILE *fp);
+int ferror(FILE *fp);
+int fileno(FILE *fp);
 
-
-extern int _IO_vfscanf (_IO_FILE * __restrict, const char * __restrict,
-   __gnuc_va_list, int *__restrict);
-extern int _IO_vfprintf (_IO_FILE *__restrict, const char *__restrict,
-    __gnuc_va_list);
-extern __ssize_t _IO_padn (_IO_FILE *, int, __ssize_t);
-extern size_t _IO_sgetn (_IO_FILE *, void *, size_t);
-
-extern __off64_t _IO_seekoff (_IO_FILE *, __off64_t, int, int);
-extern __off64_t _IO_seekpos (_IO_FILE *, __off64_t, int);
-
-extern void _IO_free_backup_area (_IO_FILE *) __attribute__ ((__nothrow__ , __leaf__));
-*/
 
 #endif  /* __STDC_LIBIO_H */

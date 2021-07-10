@@ -22,18 +22,25 @@
 
 #include <stddef.h>
 
-int __syscall(int no, ...);
+int __syscall0(int no, ...);
+int __syscall1(int no, ...);
+int __syscall2(int no, ...);
+int __syscall3(int no, ...);
+int __syscall4(int no, ...);
+int __syscall5(int no, ...);
+int __syscall6(int no, ...);
+int __syscall7(int no, ...);
 
 #define sz(i)   ((size_t)(i))
-#define syscall(no,...)                 syscall_x(no, __VA_ARGS__, 5, 4, 3, 2, 1, 0)
-#define syscall_x(a,b,c,d,e,f,g,...)    syscall_ ## g (a,b,c,d,e,f,g)
-#define syscall_0(a,b,c,d,e,f,g)        __syscall(a)
-#define syscall_1(a,b,c,d,e,f,g)        __syscall(a,sz(b))
-#define syscall_2(a,b,c,d,e,f,g)        __syscall(a,sz(b),sz(c))
-#define syscall_3(a,b,c,d,e,f,g)        __syscall(a,sz(b),sz(c),sz(d))
-#define syscall_4(a,b,c,d,e,f,g)        __syscall(a,sz(b),sz(c),sz(d),sz(e))
-#define syscall_5(a,b,c,d,e,f,g)        __syscall(a,sz(b),sz(c),sz(d),sz(e),sz(f))
-
-
+#define syscall(no,...)                     syscall_x(no, __VA_ARGS__, 7, 6, 5, 4, 3, 2, 1, 0)
+#define syscall_x(a,b,c,d,e,f,g,h,i,...)    syscall_ ## i (a,b,c,d,e,f,g,h)
+#define syscall_0(a,b,c,d,e,f,g,h)          __syscall0(a)
+#define syscall_1(a,b,c,d,e,f,g,h)          __syscall1(a,sz(b))
+#define syscall_2(a,b,c,d,e,f,g,h)          __syscall2(a,sz(b),sz(c))
+#define syscall_3(a,b,c,d,e,f,g,h)          __syscall3(a,sz(b),sz(c),sz(d))
+#define syscall_4(a,b,c,d,e,f,g,h)          __syscall4(a,sz(b),sz(c),sz(d),sz(e))
+#define syscall_5(a,b,c,d,e,f,g,h)          __syscall5(a,sz(b),sz(c),sz(d),sz(e),sz(f))
+#define syscall_6(a,b,c,d,e,f,g,h)          __syscall6(a,sz(b),sz(c),sz(d),sz(e),sz(f),sz(g))
+#define syscall_7(a,b,c,d,e,f,g,h)          __syscall7(a,sz(b),sz(c),sz(d),sz(e),sz(f),sz(g),sz(h))
 
 #endif  /* __SYS_SYSCALL_H */

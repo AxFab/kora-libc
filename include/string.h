@@ -22,6 +22,10 @@
 #include <stddef.h>
 #include <bits/cdefs.h>
 
+#ifdef __LOCALE
+# include <bits/locale.h>
+#endif
+
 __STDC_GUARD
 
 #if !defined _TCHAR
@@ -38,7 +42,24 @@ char *strerror_r(int errnum, char *buf, int len);
 /* Gives an error message string. */
 char *strerror(int errnum);
 
+#ifdef __LOCALE
+/* Gives an error message string. */
+char *strerror_l(int errnum, locale_t l);
 #endif
+
+#ifdef __GNU
+
+#define strdupa(x)  strcpy(alloca(strlen(x)+1),x)
+int strverscmp(const char *, const char *);
+char *strchrnul(const char *, int);
+char *strcasestr(const char *, const char *);
+void *memmem(const void *, size_t, const void *, size_t);
+void *memrchr(const void *, int, size_t);
+void *mempcpy(void *, const void *, size_t);
+
+#endif
+
+#endif  /* _TCHAR */
 
 
 /* Searches the first len bytes of array str for character c. */
@@ -112,7 +133,15 @@ int _SFX(ncoll)(const _TCHAR *s1, const _TCHAR *s2, size_t maxlen);
 int _SFX(nicoll)(const _TCHAR *s1, const _TCHAR *s2, size_t maxlen);
 
 /* String transformation */
-size_t _SFX(xfrm)(char *dest, const char *src, size_t n);
+size_t _SFX(xfrm)(_TCHAR *dest, const _TCHAR *src, size_t n);
+
+
+#ifdef __LOCALE
+/* Compare strings using locale-specific information. */
+int _SFX(coll_l)(const _TCHAR *s1, const _TCHAR *s2, locale_t l);
+/* String transformation */
+size_t _SFX(xfrm_l)(_TCHAR *dest, const _TCHAR *src, size_t n, locale_t l);
+#endif
 
 
 #undef _TVOID

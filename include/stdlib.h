@@ -107,52 +107,40 @@ void srand(unsigned int seed);
 int rand_r(unsigned int *seed);
 
 
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+struct drand48_data {
+    unsigned short __seed48i[3];
+    unsigned short __seed48d[4];
+};
+
 double drand48(void);
 double erand48(unsigned short int xsubi[3]);
-
 
 long int lrand48(void);
 long int nrand48(unsigned short int xsubi[3]);
 
-
 long int mrand48(void);
 long int jrand48(unsigned short int xsubi[3]);
-
 
 void srand48(long int seedval);
 unsigned short int *seed48(unsigned short int seed16v[3]);
 void lcong48(unsigned short int param[7]);
 
-
-
-struct drand48_data {
-    unsigned short int x[3];
-    unsigned short int old_x[3];
-    unsigned short int c;
-    unsigned short int init;
-    unsigned long long int a;
-
-};
-
-
 int drand48_r(struct drand48_data *restrict buffer, double *restrict result);
 int erand48_r(unsigned short int xsubi[3], struct drand48_data *restrict buffer, double *restrict result);
-
 
 int lrand48_r(struct drand48_data *restrict buffer, long int *restrict result);
 int nrand48_r(unsigned short int xsubi[3], struct drand48_data *restrict buffer,  long int *restrict result);
 
-
 int mrand48_r(struct drand48_data *restrict buffer, long int *restrict result);
 int jrand48_r(unsigned short int xsubi[3], struct drand48_data *restrict buffer, long int *restrict result);
 
-
 int srand48_r(long int seedval, struct drand48_data *buffer);
-
 int seed48_r(unsigned short int seed16v[3],  struct drand48_data *buffer);
-
 int lcong48_r(unsigned short int param[7],  struct drand48_data *buffer);
 
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 
 
@@ -160,15 +148,7 @@ int lcong48_r(unsigned short int param[7],  struct drand48_data *buffer);
 
 
 
-
-void *malloc(size_t size);
-void *calloc(size_t nmemb, size_t size);
-
-void *realloc(void *ptr, size_t size);
-
-void free(void *ptr);
-void cfree(void *ptr);
-
+#include <malloc.h>
 
 
 // # 1 "/usr/include/alloca.h" 1 3 4
@@ -176,14 +156,6 @@ void cfree(void *ptr);
 // # 1 "/usr/lib/gcc/x86_64-linux-gnu/6/include/stddef.h" 1 3 4
 // # 25 "/usr/include/alloca.h" 2 3 4
 void *alloca(size_t size);
-
-
-
-
-void *valloc(size_t size);
-
-int posix_memalign(void **memptr, size_t alignment, size_t size);
-void *aligned_alloc(size_t alignment, size_t size);
 
 
 
@@ -209,7 +181,7 @@ int mkstemps(char *template, int suffixlen);
 char *mkdtemp(char *template);
 
 
-int system(const char *command) ;
+int system(const char *command);
 char *realpath(const char *restrict name, char *restrict resolved);
 
 

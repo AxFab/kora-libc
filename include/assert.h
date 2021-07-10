@@ -17,6 +17,9 @@
  *
  *   - - - - - - - - - - - - - - -
  */
+#ifndef __ASSERT_H
+#define __ASSERT_H 1
+
 #include <bits/cdefs.h>
 
 #undef assert
@@ -32,6 +35,10 @@
 # define static_assert _Static_assert
 #endif
 
+__STDC_GUARD
 
 _Noreturn void __assert_fail(const char *assertion, const char *file, unsigned line, const char *function);
 
+__STDC_END
+
+#endif  /* __ASSERT_H */

@@ -127,12 +127,10 @@ size_t strftime_(FILE *fp, const char *str, const struct tm *tm)
     return fp->count_;
 }
 
-void _sfile(FILE *fp, char *buf, int len);
-
 size_t strftime(char *buf, size_t len, const char *fmt, const struct tm *tm)
 {
     FILE fp;
-    _sfile(&fp, buf, len);
+    __fstr_open_rw(&fp, buf, len);
     return strftime_(&fp, fmt, tm);
 }
 

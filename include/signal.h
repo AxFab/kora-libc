@@ -22,6 +22,7 @@
 
 #include <bits/cdefs.h>
 #include <bits/signum.h>
+#include <bits/signal.h>
 #include <bits/types.h>
 
 __STDC_GUARD
@@ -31,16 +32,21 @@ __STDC_GUARD
 #define SIG_UNBLOCK   1
 #define SIG_SETMASK   2
 
-typedef int sig_atomic_t;
-typedef void (*sighandler_t)(int);
-
 #define SIG_DFL  ((void (*)(int)) 0)
 #define SIG_ERR  ((void (*)(int))-1)
 #define SIG_IGN  ((void (*)(int)) 1)
 
-int kill(__pid_t, int);
+int kill(__pid_t pid, int signum);
 sighandler_t signal(int signum, sighandler_t handler);
-int raise(int);
+int raise(int signum);
+
+
+struct sigaction;
+
+int sigaction(int signum, const struct sigaction *restrict newsa,
+              struct sigaction *restrict oldsa);
+
+int sigprocmask(int op, const sigset_t *restrict newset, sigset_t *restrict oldset);
 
 
 __STDC_END

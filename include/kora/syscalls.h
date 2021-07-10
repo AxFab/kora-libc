@@ -22,7 +22,149 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include <kernel/syscalls.h>
+
+#include <bits/xtime.h>
+#include <bits/types.h>
+
+typedef int64_t xoff_t;
+
+struct dirent {
+    int d_ino;
+    int d_off;
+    unsigned short int d_reclen;
+    unsigned char d_type;
+    char d_name[256];
+};
+
+struct filemeta {
+    int ino;
+    int dev;
+    int block;
+    int ftype;
+
+    int64_t size;
+    int64_t rsize;
+
+    uint64_t ctime;
+    uint64_t mtime;
+    uint64_t atime;
+    uint64_t btime;
+};
+
+enum sys_vars {
+    SNFO_NONE = 0,
+    SNFO_ARCH,
+    SNFO_SNAME,
+    SNFO_OSNAME,
+    SNFO_PWD,
+    // SNFO_ARCH
+    // SNFO_GITH
+    // SNFO_SNAME
+    // SNFO_VERSION
+    // SNFO_RELEASE
+    // SNFO_OSNAME
+    // SNFO_HOSTNAME
+    // SNFO_DOMAIN
+    // SNFO_USER
+    // SNFO_USERNAME
+    // SNFO_USERMAIL
+    // SNFO_PWD
+};
+
+enum syscall_no {
+    SYS_EXIT = 0,
+    SYS_SLEEP,
+
+    SYS_FUTEX_WAIT,
+    SYS_FUTEX_REQUEUE,
+    SYS_FUTEX_WAKE,
+
+    SYS_SPAWN,
+    SYS_THREAD,
+
+    SYS_MMAP,
+    SYS_MUNMAP,
+    SYS_MPROTECT,
+
+    SYS_GINFO, // 10
+    SYS_SINFO,
+
+    SYS_OPEN,
+    SYS_CREATE,
+    SYS_CLOSE,
+    SYS_OPENDIR,
+    SYS_READDIR,
+    SYS_SEEK,
+    SYS_READ, // 16
+    SYS_WRITE,
+    SYS_ACCESS,
+    SYS_FCNTL, // 19
+
+    SYS_PIPE,
+    SYS_WINDOW,
+    SYS_FSTAT,
+
+    SYS_XTIME,
+};
+
+// #define SPW_SHUTDOWN 0xcafe
+// #define SPW_REBOOT 0xbeca
+// #define SPW_SLEEP 0xbabe
+// #define SPW_HIBERNATE 0xbeaf
+// #define SPW_SESSION 0xdead
+
+
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
+// Tasks, Process
+
+void sys_exit(int code);
+// long sys_wait(int pid, int *status, int option);
+long sys_sleep(xtime_t *timeout, xtime_t *remain);
+long sys_futex_wait(int *addr, int val, xtime_t *timeout, int flags);
+long sys_futex_requeue(int *addr, int val, int val2, int *addr2, int flags);
+long sys_futex_wake(int *addr, int val);
+
+long sys_spawn(const char *program, const char **args, const char **envs, int *streams, int flags);
+long sys_thread(const char *name, void *entry, void *params, size_t len, int flags);
+
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
+// Memory
+void *sys_mmap(void *addr, size_t length, unsigned flags, int fd, size_t off);
+long sys_munmap(void *addr, size_t length);
+long sys_mprotect(void *addr, size_t length, unsigned flags);
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
+
+long sys_ginfo(unsigned info, char *buf, size_t len);
+long sys_sinfo(unsigned info, const char *buf, size_t len);
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
+// File system
+long sys_open(int dirfd, const char *path, int flags, int mode);
+long sys_close(int fd);
+long sys_readdir(int fd, char *buf, size_t len);
+long sys_seek(int fd, xoff_t offset, int whence);
+long sys_read(int fd, char *buf, int len);
+long sys_write(int fd, const char *buf, int len);
+long sys_access(int dirfd, const char *path, int flags);
+long sys_fcntl(int fd, int cmd, void **args);
+long sys_fstat(int dirfd, const char *path, struct filemeta *meta, int flags);
+
+// #define SYS_WINDOW  18
+// #define SYS_PIPE  19
+long sys_pipe(int *fds, int flags);
+
+
+int sys_xtime(int name, xtime_t *ptime);
+
+/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
+
+// Signals
+// #define SYS_SIGRAISE  15
+// #define SYS_SIGACTION  16
+// #define SYS_SIGRETURN  17
+
+
+
+// #include <kernel/syscalls.h>
 
 // #define SYS_POWER  12
 // #define SYS_SCALL  13
@@ -133,18 +275,6 @@
 
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= */
-
-int __syscall(int no, ...);
-
-#define sz(i)   ((size_t)(i))
-#define syscall(no,...)                 syscall_x(no, __VA_ARGS__, 5, 4, 3, 2, 1, 0)
-#define syscall_x(a,b,c,d,e,f,g,...)    syscall_ ## g (a,b,c,d,e,f,g)
-#define syscall_0(a,b,c,d,e,f,g)        __syscall(a)
-#define syscall_1(a,b,c,d,e,f,g)        __syscall(a,sz(b))
-#define syscall_2(a,b,c,d,e,f,g)        __syscall(a,sz(b),sz(c))
-#define syscall_3(a,b,c,d,e,f,g)        __syscall(a,sz(b),sz(c),sz(d))
-#define syscall_4(a,b,c,d,e,f,g)        __syscall(a,sz(b),sz(c),sz(d),sz(e))
-#define syscall_5(a,b,c,d,e,f,g)        __syscall(a,sz(b),sz(c),sz(d),sz(e),sz(f))
 
 
 #endif  /* _KORA_SYSCALLS_H */

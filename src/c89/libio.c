@@ -24,19 +24,94 @@
 #include "stdc.h"
 #include <kora/mcrs.h>
 
+FILE __stdio[3];
+FILE *stdin = &__stdio[0];
+FILE *stdout = &__stdio[1];
+FILE *stderr = &__stdio[2];
+
+static int _fread(FILE *fp, char *buf, size_t len)
+{
+    /* If unbuffered */
+    if (fp->oflags_ & _IONBF)
+        return read(fp->fd_, buf, len);
+
+    if (fp->rbf_.base_ == NULL) {
+        fp->rbf_.base_ = malloc(512); // TODO BUFSZ
+        fp->rbf_.pos_ = fp->rbf_.base_;
+        fp->rbf_.end_ = fp->rbf_.pos_;
+    }
+
+    int bytes = 0;
+    while (len > 0) {
+        if (fp->rbf_.end_ == fp->rbf_.pos_) {
+            int rd = read(fp->fd_, fp->rbf_.base_, 512);
+            if (rd <= 0) {
+                free(fp->rbf_.base_);
+                fp->rbf_.base_ = NULL;
+                return bytes == 0 ? rd : bytes;
+            }
+            fp->rbf_.end_ = fp->rbf_.pos_ + rd;
+        }
+        int cap = MIN(len, (size_t)(fp->rbf_.end_ - fp->rbf_.pos_));
+        if (cap != 0)
+            memcpy(buf, fp->rbf_.pos_, cap);
+        buf += cap;
+        len -= cap;
+        bytes += cap;
+        fp->rbf_.pos_ += cap;
+    }
+
+    return bytes;
+}
+
+static int _fwrite(FILE *fp, const char *buf, size_t len)
+{
+    /* If unbuffered */
+    if (fp->oflags_ & _IONBF)
+        return write(fp->fd_, buf, len);
+    /* TODO */
+    return write(fp->fd_, buf, len);
+}
+
+static int _fseek(FILE *fp, long pos, int dir)
+{
+    return lseek(fp->fd_, pos, dir);
+}
+
+static void __fvopen(FILE *fp, int fd, int oflags)
+{
+    memset(fp, 0, sizeof(*fp));
+    fp->fd_ = fd;
+    fp->oflags_ = oflags | _IOLBF;
+    fp->read = _fread;
+    fp->write = _fwrite;
+    fp->seek = _fseek;
+}
+
+void __stdio_init()
+{
+    __fvopen(stdin, 0, O_RDONLY);
+    __fvopen(stdout, 1, O_WRONLY);
+    __fvopen(stderr, 2, O_WRONLY);
+}
+
+void __stdio_fini()
+{
+}
+
 /* Parse the character base mode for opening file and return binary mode
  * The mode parameter must start by on of this sequence:
- *   r  Open the file for reading. The stream is positioned at the
+ *   r  Open the file for reading. The fp is positioned at the
  *        beginning of the file.
- *   r+ Open the file for reading and writing. The stream is positioned at
+ *   r+ Open the file for reading and writing. The fp is positioned at
  *        the beginning of the file.
  *   w  Truncate file to zero length or create a new file for writing. The
- *        stream is positioned at the beginning of the file.
+ *        fp is positioned at the beginning of the file.
  *   w+ Open the file for reading and writing. The file is created if
- *        needed, or truncated. The stream is positioned at the beginning
+ *        needed, or truncated. The fp is positioned at the beginning
  *        of the file.
  *   a  Open for appending (writing at the end). The file is created if it
- *        doesn't exist. The stream is positioned at the end of file.
+ *        doesn't exist. The fp is positioned at the end of file.
  *   a+  Open for reading and appending (writing at the ent). The initial
  *        file position is at the beginning, but output is always append
  *        to the end.
@@ -98,7 +173,7 @@ int oflags(const char *mode)
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
-/* Flush a stream, ignoring lock */
+/* Flush a fp, ignoring lock */
 int fflush_unlocked(FILE *fp)
 {
     /* If reading, sync position */
@@ -112,25 +187,25 @@ int fflush_unlocked(FILE *fp)
     }
 
     /* Clear read and write modes */
-    // stream->rbf_.pos_ = NULL;
-    // stream->rbf_.base_ = NULL;
-    // stream->rbf_.end_ = NULL;
-    // stream->wbf_.pos_ = NULL;
-    // stream->wbf_.base_ = NULL;
-    // stream->wbf_.end_ = NULL;
+    // fp->rbf_.pos_ = NULL;
+    // fp->rbf_.base_ = NULL;
+    // fp->rbf_.end_ = NULL;
+    // fp->wbf_.pos_ = NULL;
+    // fp->wbf_.base_ = NULL;
+    // fp->wbf_.end_ = NULL;
     return 0;
 }
 
 
-/* Flush a stream */
-int fflush(FILE *stream)
+/* Flush a fp */
+int fflush(FILE *fp)
 {
     int ret;
 
-    if (stream) {
-        FLOCK(stream);
-        ret = fflush_unlocked(stream);
-        FUNLOCK(stream);
+    if (fp) {
+        FLOCK(fp);
+        ret = fflush_unlocked(fp);
+        FUNLOCK(fp);
         return ret;
     }
 
@@ -141,85 +216,33 @@ int fflush(FILE *stream)
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
-static int _fread(FILE *fp, char *buf, size_t len)
-{
-    /* If unbuffered */
-    if (fp->oflags_ & _IONBF)
-        return read(fp->fd_, buf, len);
-
-    if (fp->rbf_.base_ == NULL) {
-        fp->rbf_.base_ = malloc(512); // TODO BUFSZ
-        fp->rbf_.pos_ = fp->rbf_.base_;
-        fp->rbf_.end_ = fp->rbf_.pos_;
-    }
-
-    int bytes = 0;
-    while (len > 0) {
-        if (fp->rbf_.end_ == fp->rbf_.pos_) {
-            int rd = read(fp->fd_, fp->rbf_.base_, 512);
-            if (rd <= 0) {
-                free(fp->rbf_.base_);
-                fp->rbf_.base_ = NULL;
-                return bytes == 0 ? rd : bytes;
-            }
-            fp->rbf_.end_ = fp->rbf_.pos_ + rd;
-        }
-        int cap = MIN(len, (size_t)(fp->rbf_.end_ - fp->rbf_.pos_));
-        if (cap != 0)
-            memcpy(buf, fp->rbf_.pos_, cap);
-        buf += cap;
-        len -= cap;
-        bytes += cap;
-        fp->rbf_.pos_ += cap;
-    }
-
-    return bytes;
-}
-
-static int _fwrite(FILE *fp, const char *buf, size_t len)
-{
-    /* If unbuffered */
-    if (fp->oflags_ & _IONBF)
-        return write(fp->fd_, buf, len);
-    /* TODO */
-    return write(fp->fd_, buf, len);
-}
-
-static int _fseek(FILE *fp, long pos, int dir)
-{
-    return lseek(fp->fd_, pos, dir);
-}
-
-
-/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
-
 /* Stream close functions */
-int fclose(FILE *stream)
+int fclose(FILE *fp)
 {
     int ret;
     int perm;
 
-    if (stream == NULL)
+    if (fp == NULL)
         return 0;
 
-    assert(stream->write == _fwrite && stream->read == _fread);
+    assert(fp->write == _fwrite && fp->read == _fread);
 
-    FLOCK(stream);
-    perm = stream->flags_ & F_PERM;
+    FLOCK(fp);
+    perm = fp->flags_ & F_PERM;
     if (!perm) {
         /* TODO struct _IO_FILE_ are linked, remove fom the list! */
     }
 
-    ret = fflush_unlocked(stream);
-    ret |= close(stream->fd_);
+    ret = fflush_unlocked(fp);
+    ret |= close(fp->fd_);
 
-    if (stream->rbf_.base_)
-        free(stream->rbf_.base_);
-    if (stream->wbf_.base_)
-        free(stream->wbf_.base_);
+    if (fp->rbf_.base_)
+        free(fp->rbf_.base_);
+    if (fp->wbf_.base_)
+        free(fp->wbf_.base_);
     if (!perm) {
-        FRMLOCK(stream);
-        free(stream);
+        FRMLOCK(fp);
+        free(fp);
     }
 
     return ret;
@@ -243,12 +266,7 @@ FILE *fvopen(int fd, int oflags)
     if (!fp)
         return NULL;
 
-    memset(fp, 0, sizeof(*fp));
-    fp->fd_ = fd;
-    fp->oflags_ = oflags | _IOLBF;
-    fp->read = _fread;
-    fp->write = _fwrite;
-    fp->seek = _fseek;
+    __fvopen(fp, fd, oflags | _IOLBF);
     return fp;
 }
 
@@ -278,7 +296,7 @@ FILE *fopen(const char *path, const char *mode)
 }
 
 
-/* Create a stream for a opened file */
+/* Create a fp for a opened file */
 FILE *fdopen(int fd, const char *mode)
 {
     int ofs;
@@ -293,115 +311,125 @@ FILE *fdopen(int fd, const char *mode)
 
 
 /* Stream open functions */
-FILE *freopen(const char *path, const char *mode, FILE *stream)
+FILE *freopen(const char *path, const char *mode, FILE *fp)
 {
     FILE *newstm;
     // int oflg = oflags(mode);
-    FLOCK(stream);
-    fflush_unlocked(stream);
+    FLOCK(fp);
+    fflush_unlocked(fp);
 
     // if (!path) {
     //     if (oflg & O_CLOEXEC)
-    //         fcntl(stream->fd_, F_SETFD, FD_CLOEXEC);
+    //         fcntl(fp->fd_, F_SETFD, FD_CLOEXEC);
     //     oflg &= ~(O_CREAT | O_EXCL | O_CLOEXEC);
-    //     if (fcntl(stream->fd_, F_SETFL, oflg) < 0) {
-    //         fclose(stream);
+    //     if (fcntl(fp->fd_, F_SETFL, oflg) < 0) {
+    //         fclose(fp);
     //         return NULL;
     //     }
-    //     FUNLOCK(stream);
-    //     return stream;
+    //     FUNLOCK(fp);
+    //     return fp;
     // }
 
     newstm = fopen(path, mode);
     if (!newstm) {
-        fclose(stream);
+        fclose(fp);
         return NULL;
     }
-    if (newstm->fd_ == stream->fd_)
+    if (newstm->fd_ == fp->fd_)
         newstm->fd_ = -1; /* avoid closing in fclose */
     // else if (__dup3(f2->fd, f->fd, oflg & O_CLOEXEC) < 0) {
     //   fclose(newstm);
-    //   fclose(stream);
+    //   fclose(fp);
     //   return NULL;
     // }
 
-    stream->flags_ = (stream->flags_ & F_PERM) | newstm->flags_;
-    stream->read = newstm->read;
-    stream->write = newstm->write;
-    stream->seek = newstm->seek;
-    // stream->close = newstm->close;
+    fp->flags_ = (fp->flags_ & F_PERM) | newstm->flags_;
+    fp->read = newstm->read;
+    fp->write = newstm->write;
+    fp->seek = newstm->seek;
+    // fp->close = newstm->close;
     fclose(newstm);
-    FUNLOCK(stream);
-    return stream;
+    FUNLOCK(fp);
+    return fp;
 }
 
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
-/* Binary stream input */
-size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
+size_t fread_unlocked(void *ptr, size_t size, size_t nmemb, FILE *fp)
 {
     size_t items = 0;
-    FLOCK(stream);
     for (items = 0; items < nmemb; ++items) {
-        if (stream->read(stream, ptr, size) == EOF)
+        if (fp->read(fp, ptr, size) == EOF)
             break;
         ptr = ((char *)ptr) + size;
     }
 
-    FUNLOCK(stream);
     return items;
 }
 
-
-/* Binary stream output */
-size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
+size_t fwrite_unlocked(const void *ptr, size_t size, size_t nmemb, FILE *fp)
 {
     size_t items = 0;
-    FLOCK(stream);
     for (items = 0; items < nmemb; ++items) {
-        if (stream->write(stream, ptr, size) == EOF)
+        if (fp->write(fp, ptr, size) == EOF)
             break;
         ptr = ((char *)ptr) + size;
     }
-
-    FUNLOCK(stream);
     return items;
 }
 
+/* Binary fp input */
+size_t fread(void *ptr, size_t size, size_t nmemb, FILE *fp)
+{
+    FLOCK(fp);
+    size_t items = fread_unlocked(ptr, size, nmemb, fp);
+    FUNLOCK(fp);
+    return items;
+}
+
+
+/* Binary fp output */
+size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *fp)
+{
+    FLOCK(fp);
+    size_t items = fwrite_unlocked(ptr, size, nmemb, fp);
+    FUNLOCK(fp);
+    return items;
+}
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
-/* Reposition a stream */
-int fseek(FILE *stream, long offset, int whence)
+/* Reposition a fp */
+int fseek(FILE *fp, long offset, int whence)
 {
     int ret;
-    FLOCK(stream);
+    FLOCK(fp);
 
     /* Flush write buffer, and report error on failure. */
 
-    ret = stream->seek(stream, offset, whence);
+    ret = fp->seek(fp, offset, whence);
     if (ret >= 0) {
-        stream->fpos_ = ret;
-        if (stream->rbf_.base_)
-            free(stream->rbf_.base_);
-        if (stream->wbf_.base_)
-            free(stream->wbf_.base_);
+        fp->fpos_ = ret;
+        if (fp->rbf_.base_)
+            free(fp->rbf_.base_);
+        if (fp->wbf_.base_)
+            free(fp->wbf_.base_);
     }
-    FUNLOCK(stream);
+    FUNLOCK(fp);
     return ret;
 }
 
-/* Reposition a stream */
-long ftell(FILE *stream)
+/* Reposition a fp */
+long ftell(FILE *fp)
 {
-    size_t pos = stream->fpos_;
+    size_t pos = fp->fpos_;
 
     /* Adjust for data in buffer. */
-    if (stream->rbf_.base_)
-        pos += stream->rbf_.end_ - stream->rbf_.pos_;
-    if (stream->wbf_.base_)
-        pos += stream->wbf_.end_ - stream->wbf_.pos_;
+    if (fp->rbf_.base_)
+        pos += fp->rbf_.end_ - fp->rbf_.pos_;
+    if (fp->wbf_.base_)
+        pos += fp->wbf_.end_ - fp->wbf_.pos_;
 
     // if (pos > LONG_MAX) {
     //     errno = EOVERFLOW;
@@ -410,24 +438,24 @@ long ftell(FILE *stream)
     return (long)pos;
 }
 
-/* Reposition a stream */
-void rewind(FILE *stream)
+/* Reposition a fp */
+void rewind(FILE *fp)
 {
-    fflush(stream);
-    fseek(stream, 0, SEEK_SET);
+    fflush(fp);
+    fseek(fp, 0, SEEK_SET);
 }
 
-/* Reposition a stream */
-int fgetpos(FILE *stream, fpos_t *pos)
+/* Reposition a fp */
+int fgetpos(FILE *fp, fpos_t *pos)
 {
-    *pos = (fpos_t)stream->fpos_;
+    *pos = (fpos_t)fp->fpos_;
     return 0;
 }
 
-/* Reposition a stream */
-int fsetpos(FILE *stream, fpos_t *pos)
+/* Reposition a fp */
+int fsetpos(FILE *fp, fpos_t *pos)
 {
-    if (fseek(stream, (long)*pos, SEEK_SET) >= 0)
+    if (fseek(fp, (long)*pos, SEEK_SET) >= 0)
         return 0;
     return -1;
 }
@@ -435,165 +463,67 @@ int fsetpos(FILE *stream, fpos_t *pos)
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
-/* Check and reset stream status */
-void clearerr(FILE *stream)
+/* Check and reset fp status */
+void clearerr(FILE *fp)
 {
-    stream->flags_ &= !(FF_EOF | FF_ERR);
+    fp->flags_ &= !(F_EOF | F_ERR);
 }
 
-/* Check and reset stream status */
-int feof(FILE *stream)
+/* Check and reset fp status */
+int feof(FILE *fp)
 {
-    return stream->flags_ & FF_EOF;
+    return fp->flags_ & F_EOF;
 }
 
-/* Check and reset stream status */
-int ferror(FILE *stream)
+/* Check and reset fp status */
+int ferror(FILE *fp)
 {
-    return stream->flags_ & FF_ERR;
+    return fp->flags_ & F_ERR;
 }
 
-/* Check and reset stream status */
-int fileno(FILE *stream)
+/* Check and reset fp status */
+int fileno(FILE *fp)
 {
-    return stream->fd_;
+    return fp->fd_;
 }
 
-
+int fwide(FILE *fp, int mode)
+{
+    if (fp->mode == 0)
+        fp->mode = mode;
+    return fp->mode;
+}
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
 
 /* Stream buffering operations */
-void setbuf(FILE *stream, char *buf)
+int setvbuf(FILE *fp, char *buf, int mode, size_t size)
 {
-
+    fp->lbuf_ = EOF;
+    if (mode == _IONBF) {
+        fp->rbf_.base_ = NULL;
+        fp->rbf_.pos_ = NULL;
+        fp->rbf_.end_ = NULL;
+    } else if (mode == _IOFBF || mode == _IOLBF) {
+        fp->rbf_.base_ = buf;
+        fp->rbf_.pos_ = fp->rbf_.base_;
+        fp->rbf_.end_ = fp->rbf_.base_ + size;
+        if (mode == _IOLBF)
+            fp->lbuf_ = '\n';
+    } else
+        return -1;
+    return 0;
 }
 
 /* Stream buffering operations */
-int setvbuf(FILE *stream, char *buf, int mode, size_t size)
+void setbuf(FILE *restrict fp, char *restrict buf)
 {
-    return -1;
-}
-
-
-/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
-
-
-int fgetc_unlocked(FILE *stream)
-{
-    int c = 0;
-    if (stream->read(stream, (char *)&c, 1) == EOF)
-        return EOF;
-
-    return c;
-}
-
-char *fgets_unlocked(char *s, int size, FILE *stream)
-{
-    int c;
-    unsigned char *ps = (unsigned char *)s;
-
-    while (--size) {
-        c = fgetc_unlocked(stream);
-        if (c == EOF) {
-            if (errno)
-                return NULL;
-            break;
-        }
-
-        *ps = (unsigned char)c;
-        if (c == '\n') {
-            ++ps;
-            break;
-        }
-
-        ++ps;
-    }
-
-    *ps = '\0';
-    return ((void *)s == (void *)ps) ? NULL : s;
-}
-
-/* Read a character from STREAM. */
-int fgetc(FILE *stream)
-{
-    int c;
-    FLOCK(stream);
-    c = fgetc_unlocked(stream);
-    FUNLOCK(stream);
-    return c;
-}
-
-/* Read a character from STREAM. */
-int getc(FILE *stream)
-{
-    return fgetc(stream);
-}
-
-/* Get a newline-terminated string from stdin, removing the newline.
-   DO NOT USE THIS FUNCTION!!  There is no limit on how much it will read. */
-char *gets(char *s);
-
-
-/* Get a newline-terminated string of finite length from STREAM. */
-char *fgets(char *s, int n, FILE *stream)
-{
-    FLOCK(stream);
-    char *r = fgets_unlocked(s, n, stream);
-    FUNLOCK(stream);
-    return r;
+    setvbuf(fp, buf, buf ? _IOFBF : _IONBF, BUFSIZ);
 }
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
-
-/* Write a character to STREAM. */
-int fputc(int c, FILE *stream)
-{
-    size_t ret = fwrite(&c, 1, 1, stream);
-    return ((int)ret == 1) ? (unsigned char)c : EOF;
-}
-
-/* Write a character to STREAM. */
-int putc(int c, FILE *stream)
-{
-    return fputc(c, stream);
-}
-
-/* Write a string, followed by a newline, to stdout. */
-int puts(const char *s)
-{
-    int lg = strlen(s);
-    size_t ret = fwrite(s, lg, 1, stdout);
-    if ((int)ret == lg) {
-        ret = fwrite("\n", 1, 1, stdout);
-        return lg + 1;
-    }
-    return EOF;
-}
-
-
-/* Write a string to STREAM. */
-int fputs(const char *s, FILE *stream)
-{
-    int lg = strlen(s);
-    size_t ret = fwrite(s, lg, 1, stream);
-    return ((int)ret == lg) ? lg : EOF;
-}
-
-/* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
-
-/* Read a character from stdin. */
-int getchar(void)
-{
-    return fgetc(stdin);
-}
-
-/* Write a character to stdout. */
-int putchar(int c)
-{
-    return fputc(c, stdout);
-}
 
 /* Push a character back onto the input buffer of STREAM. */
-int ungetc(int c, FILE *stream);
+int ungetc(int c, FILE *fp);
 

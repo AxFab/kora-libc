@@ -2,9 +2,11 @@
 #ifndef _SYS_SOCKET_H
 #define _SYS_SOCKET_H 1
 
+#include <bits/cdefs.h>
 #include <sys/types.h>
 // #include <sys/uio.h>
 
+__STDC_GUARD
 
 typedef int socklen_t;
 typedef unsigned sa_family_t;
@@ -126,8 +128,6 @@ typedef enum {
     NPROTO_UDP           = 2, // Ipv4 UDP
 };
 
-
-
-
+__STDC_END
 
 #endif  /* _SYS_SOCKET_H */

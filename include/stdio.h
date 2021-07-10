@@ -7,6 +7,7 @@
 #include <bits/types.h>
 #include <bits/libio.h>
 
+__STDC_GUARD
 
 typedef __off_t off_t;
 typedef __ssize_t ssize_t;
@@ -65,6 +66,7 @@ int fputc(int c, FILE *stream);
 int putc(int c, FILE *stream);
 int putchar(int c);
 
+char *gets(char *restrict s);
 char *fgets(char *restrict s, int n, FILE *restrict stream);
 int fputs(const char *restrict s, FILE *restrict stream);
 int puts(const char *s);
@@ -157,18 +159,6 @@ char *cuserid(char *s);
 void setlinebuf(FILE *stream);
 void setbuffer(FILE *restrict stream, char *restrict buf, size_t size);
 
-int fgetc_unlocked(FILE *stream);
-int fputc_unlocked(int c, FILE *stream);
-int fflush_unlocked(FILE *stream);
-
-size_t fread_unlocked(void *restrict ptr, size_t size, size_t n, FILE *restrict stream);
-size_t fwrite_unlocked(const void *restrict ptr, size_t size,  size_t n, FILE *restrict stream);
-
-void clearerr_unlocked(FILE *stream);
-int feof_unlocked(FILE *stream);
-int ferror_unlocked(FILE *stream);
-int fileno_unlocked(FILE *stream);
-
 #endif
 
 
@@ -191,7 +181,7 @@ int fputs_unlocked(const char *str, FILE *stream);
 # define fgetpos64 fgetpos
 # define fsetpos64 fsetpos
 # define fpos64_t fpos_t
-//# define off64_t off_t
+# define off64_t __off_t
 #endif
 
 
@@ -200,6 +190,6 @@ char *tmpnam_r(char *s);
 int getw(FILE *stream);
 int putw(int w, FILE *stream);
 
-
+__STDC_END
 
 #endif  /* __STDIO_H */

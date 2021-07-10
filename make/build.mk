@@ -34,7 +34,7 @@ install-lib$(1): $(prefix)/lib/lib$(1).so
 $(libdir)/lib$(1).so: $(call fn_objs,$(2))
 	$(S) mkdir -p $$(dir $$@)
 	$(Q) echo "    LD  $$@"
-	$(V) $(LD) -shared -o $$@ $$^ $($(3))
+	$(V) $(LDC) -shared -o $$@ $$^ $($(3))
 endef
 
 define link_bin

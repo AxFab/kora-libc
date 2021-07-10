@@ -27,21 +27,17 @@
 __STDC_GUARD
 
 enum {
-    _ISupper = 0x001,
-    _ISlower = 0x002,
-    _ISalpha = 0x004,
-    _ISdigit = 0x008,
-    _ISxdigit = 0x010,
-    _ISspace = 0x020,
-    _ISprint = 0x040,
-    _ISgraph = 0x080,
-    _ISblank = 0x100,
-    _IScntrl = 0x200,
-    _ISpunct = 0x400,
-    _ISalnum = 0x800,
+    _ISalpha = 0x01,
+    _ISdigit = 0x02,
+    _ISxdigit = 0x04,
+    _ISspace = 0x08,
+    _ISprint = 0x10,
+    _ISblank = 0x20,
+    _IScntrl = 0x40,
+    _ISpunct = 0x80,
 };
 
-unsigned short int __ctype_b(int);
+unsigned char __ctype_b(int);
 int __ctype_tolower(int);
 int __ctype_toupper(int);
 
@@ -88,30 +84,27 @@ int toupper_l(int c, __locale_t l);
 
 #endif
 
-#if !defined __cplusplus && !defined _NO_CTYPE_MACRO
+#if !defined __cplusplus && !defined _CTYPE_NO_MACROS
 
-// #define isalpha(a) ((((unsigned)(a)|32)-'a') < 26)
-// #define isdigit(a) (((unsigned)(a)-'0') < 10)
-// #define islower(a) (((unsigned)(a)-'a') < 26)
-// #define isupper(a) (((unsigned)(a)-'A') < 26)
-// #define isprint(a) (((unsigned)(a)-0x20) < 0x5f)
-// #define isgraph(a) (((unsigned)(a)-0x21) < 0x5e)
-// #define isspace(a) ((a)==' '||((unsigned)(a)-'\t'<5))
-
-#define isalnum(c)  (_ISalnum & __ctype_b(c))
 #define isalpha(c)  (_ISalpha & __ctype_b(c))
 #define iscntrl(c)  (_IScntrl & __ctype_b(c))
 #define isdigit(c)  (_ISdigit & __ctype_b(c))
-#define islower(c)  (_ISlower & __ctype_b(c))
-#define isgraph(c)  (_ISgraph & __ctype_b(c))
 #define isprint(c)  (_ISprint & __ctype_b(c))
 #define ispunct(c)  (_ISpunct & __ctype_b(c))
 #define isspace(c)  (_ISspace & __ctype_b(c))
-#define isupper(c)  (_ISupper & __ctype_b(c))
 #define isxdigit(c)  (_ISxdigit & __ctype_b(c))
 #define isblank(c)  (_ISblank & __ctype_b(c))
 
+#define isalnum(c)  ((_ISalpha | _ISdigit) & __ctype_b(c))
+#define isgraph(c)  (!isspace(wc) && isprint(wc))
+
+#define islower(c)  (__ctype_toupper(c) != (c))
+#define isupper(c)  (__ctype_tolower(c) != (c))
+
 #define isascii(c)  ((unsigned)(c) < 128)
+
+#define tolower(c)  (__ctype_tolower(c))
+#define toupper(c)  (__ctype_toupper(c))
 
 #endif
 

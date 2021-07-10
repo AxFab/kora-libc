@@ -23,9 +23,32 @@
 #include <bits/types.h>
 #include <bits/mman.h>
 
+__STDC_GUARD
+
 void *mmap(void *addr, size_t length, int prot, int flags, int fd, __off_t off);
 int munmap(void *addr, size_t length);
 
+int mprotect(void *addr, size_t length, int prot);
+int msync(void *addr, size_t length, int flags);
 
+int mlock(const void *addr, size_t length);
+int munlock(const void *addr, size_t length);
+int mlockall(int);
+int munlockall(void);
+
+#if defined(__GNU) || defined(__BSD)
+int madvise(void *, size_t, int);
+int mincore(void *, size_t, unsigned char *);
+#endif
+
+int shm_open(const char *name, int oflag, __mode_t mode);
+int shm_unlink(const char *name);
+
+
+#ifdef __LARGEFILE64
+# define mmap64 mmap
+#endif
+
+__STDC_END
 
 #endif  /* _SYS_MMAN_H */

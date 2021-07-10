@@ -1,23 +1,19 @@
 #ifndef __THREADS_H
 #define __THREADS_H 1
 
-#include <kora/atomic.h>
+#include <bits/cdefs.h>
+#include <bits/atomic.h>
 #include <time.h>
 
+__STDC_GUARD
+
 #define ONCE_FLAG_INIT {0}
-#define TSS_DTOR_ITERATIONS 1
-
-static inline void cpu_relax()
-{
-}
-
-static inline void cpu_barrier()
-{
-}
+#define TSS_DTOR_ITERATIONS 4
 
 typedef int(*thrd_start_t)(void *);
 typedef void(*tss_dtor_t)(void *);
 
+typedef int once_flag;
 typedef struct mtx mtx_t;
 typedef struct cnd cnd_t;
 typedef unsigned tss_t;
@@ -25,7 +21,7 @@ typedef unsigned tss_t;
 #ifdef _MSC_VER
 #include <windows.h>
 typedef HANDLE thrd_t;
-#elif defined _THREADS_H
+#elif defined _USE_PTHREADS
 #include <pthread.h>
 typedef pthread_t thrd_t;
 #else
@@ -111,5 +107,9 @@ int cnd_timedwait(cnd_t *restrict cond, mtx_t *restrict mutex, const struct time
 /* destroys a condition variable */
 void cnd_destroy(cnd_t *cond);
 
+
+void call_once(once_flag *, void (*call)(void));
+
+__STDC_END
 
 #endif  /* __THREADS_H */

@@ -20,7 +20,7 @@
 #ifndef __SYS_TYPES_H
 #define __SYS_TYPES_H 1
 
-#include <sys/types.h>
+#include <bits/types.h>
 
 typedef __u_char u_char;
 typedef __u_short u_short;

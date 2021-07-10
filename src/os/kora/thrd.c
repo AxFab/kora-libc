@@ -21,10 +21,12 @@
 #include <bits/libio.h>
 #include <kora/splock.h>
 #include <kora/mcrs.h>
+#include <sys/syscall.h>
 #include <kora/syscalls.h>
 #include <threads.h>
 #include <string.h>
 #include <errno.h>
+#include <unistd.h>
 
 
 // void usleep(__useconds_t usec)
@@ -58,7 +60,7 @@ int __exec(char *name, const char **argv, const char **env, int fds[3])
     return ret;
 }
 
-_Noreturn void exit(int res)
+_Noreturn void _Exit(int res)
 {
     for (;;)
         syscall(SYS_EXIT, res, 0);
@@ -86,7 +88,7 @@ int thrd_create(thrd_t *thr, thrd_start_t func, void *arg)
     if (ret == 0)
         return thrd_error;
     if (thr != NULL)
-    *thr = ret;
+        *thr = ret;
     return thrd_success;
 }
 

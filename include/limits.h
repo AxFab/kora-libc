@@ -21,7 +21,7 @@
 #define __LIMITS_H 1
 
 #include <bits/cdefs.h>
-#include <bits/posix_lim.h>
+#include <bits/limits_posix.h>
 #include <bits/limits_sys.h>
 
 #if '\xff' > 0

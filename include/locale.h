@@ -64,6 +64,13 @@ struct lconv {
 char *setlocale(int, const char *);
 struct lconv *localeconv(void);
 
+typedef struct __locale *locale_t;
+locale_t __current_locale(void);
+
+#ifdef __LOCALE
+
+
+#define LC_GLOBAL_LOCALE ((locale_t)-1)
 
 #define LC_CTYPE_MASK    (1<<LC_CTYPE)
 #define LC_NUMERIC_MASK  (1<<LC_NUMERIC)
@@ -73,12 +80,12 @@ struct lconv *localeconv(void);
 #define LC_MESSAGES_MASK (1<<LC_MESSAGES)
 #define LC_ALL_MASK      0x7fffffff
 
-// #define LC_GLOBAL_LOCALE ((locale_t)-1)
-// locale_t duplocale(locale_t);
-// void freelocale(locale_t);
-// locale_t newlocale(int, const char *, locale_t);
-// locale_t uselocale(locale_t);
+locale_t duplocale(locale_t);
+void freelocale(locale_t);
+locale_t newlocale(int, const char *, locale_t);
+locale_t uselocale(locale_t);
 
+#endif
 
 __STDC_END
 

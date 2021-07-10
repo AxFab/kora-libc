@@ -30,17 +30,9 @@ typedef long double decimal_t;
 
 #include <bits/types.h>
 
-#if 100*__GNUC__+__GNUC_MINOR__ >= 303
-#define NAN       __builtin_nanf("")
-#define INFINITY  __builtin_inff()
-#else 
 #define _HUGE_ENUF  1e+300
 #define INFINITY   ((float)(_HUGE_ENUF * _HUGE_ENUF))
 #define NAN        ((float)(INFINITY * 0.0F))
-/*#else 
-#define NAN       (0.0f/0.0f)
-#define INFINITY  1e5000f*/
-#endif
 
 #define HUGE_VALF INFINITY
 #define HUGE_VAL  ((double)INFINITY)

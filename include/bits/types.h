@@ -26,7 +26,7 @@
 
 #ifndef _NO_STATIC_ASSERT
 _Static_assert(sizeof(void *) == sizeof(size_t), "Unsupported, pointer and size_t must have the same size");
-#endif 
+#endif
 
 // #include <bits/typesizes.h>
 

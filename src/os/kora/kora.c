@@ -21,6 +21,7 @@
 #include <bits/libio.h>
 #include <kora/splock.h>
 #include <kora/mcrs.h>
+#include <sys/syscall.h>
 #include <kora/syscalls.h>
 #include <sys/mman.h>
 #include <string.h>
@@ -33,7 +34,7 @@ FILE *fvopen(int fd, int o);
 void setup_allocator(void *, size_t);
 int snprintf(char *buf, size_t len, const char *msg, ...);
 int write(int fd, char *buf, size_t len);
-
+int fclose(FILE *fp);
 
 int futex_wait(int *addr, int val, long timeout, int flags)
 {
@@ -46,9 +47,9 @@ int futex_requeue(int *addr, int val, int val2, int *addr2, int flags)
     return syscall(SYS_FUTEX_REQUEUE, addr, val, val2, addr2, flags);
 }
 
-int futex_wake(int *addr, int val)
+int futex_wake(int *addr, int val, int flags)
 {
-    return syscall(SYS_FUTEX_REQUEUE, addr, val, 0, NULL, 0);
+    return syscall(SYS_FUTEX_REQUEUE, addr, val, 0, NULL, flags);
 }
 
 
@@ -109,22 +110,6 @@ void __perror_fail(int err, const char *file, int line, const char *msg)
 {
     char buf[4096];
     int lg = snprintf(buf, 4096, "Proc error %d at %s:%d : %s\n", err, file, line, msg);
-    write(2, buf, lg);
-    exit(-1);
-}
-
-_Noreturn void __assert_fail(const char *expr, const char *file, int line, const char *func)
-{
-    char buf[4096];
-    int lg = snprintf(buf, 4096, "Assertion %s at %s:%d in %s\n", expr, file, line, func);
-    write(2, buf, lg);
-    exit(-1);
-}
-
-_Noreturn void __assert(const char *expr, const char *file, int line)
-{
-    char buf[4096];
-    int lg = snprintf(buf, 4096, "Assertion %s at %s:%d\n", expr, file, line);
     write(2, buf, lg);
     exit(-1);
 }
@@ -221,29 +206,12 @@ time_t time(time_t *ptr)
     return now / _PwMicro_;
 }
 
-clock_t clock()
-{
-    return 0;
-}
-
 void gethostname(char *buf, int len)
 {
 
 }
 
-char *getenv(const char *name)
-{
-    return NULL;
-}
-
-
-_Noreturn void abort(void)
-{
-    // raise(SIGABRT);
-    exit(127);
-}
-
-xtime_t xtime_read(xtime_name_t name)
+xtime_t xtime_read(int name)
 {
     xtime_t value = 0;
     syscall(SYS_XTIME, name, &value);
