@@ -3,11 +3,9 @@
 
 build:
   stage: build
-  before_script:
-    - apt-get install -y nasm
   script:
     - make clean
-    - make
+    - make NOSCALL=y
   artifacts:
     paths:
       - lib/libc.so
@@ -16,9 +14,9 @@ test:
   stage: test
   script:
     - make clean
-    - make check
-    - make coverage
-  coverage: /(\d+)(\.\d+)?% \(\d+ of \d+ lines\)/
+    - make check NOSCALL=y GCOV=y
+    - make coverage NOSCALL=y GCOV=y
+  coverage: /(\d+(\.\d+)?)% \(\d+ of \d+ lines\)/
 
 deploy:
   stage: deploy

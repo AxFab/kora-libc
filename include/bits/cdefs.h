@@ -123,11 +123,15 @@ _Static_assert(sizeof(long long) == 8, "Unsupported, long long must be 64 bits")
 # define __C95  /* Enable ISO C90 Amendment 1:1995 extention. */
 #endif
 
+
 #define __C89
-
-
-
 #define PAGE_SIZE  4096
+
+#ifdef __NO_SCALL
+#  define _PRT(p)  kora_##p
+#else
+#  define _PRT(p)  p
+#endif
 
 #endif  /* __BITS_CDEFS_H */
 

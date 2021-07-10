@@ -57,7 +57,7 @@ static inline void ck_test_case_(Suite *s, void (*func)(int), const char *name)
     }
 }
 
-static inline void ck_run(Suite *s)
+static inline int ck_run(Suite *s)
 {
     __ck_suite = s;
     s->fails = 0;
@@ -83,6 +83,7 @@ static inline void ck_run(Suite *s)
         fprintf(stderr, "Run successfully  %d success, %d cases\n", s->success, s->cases);
     else
         fprintf(stderr, "Run success at %d%%, %d fails, %d success, %d cases\n", s->success * 100 / s->cases, s->fails, s->success, s->cases);
+    return s->fails;
 }
 
 

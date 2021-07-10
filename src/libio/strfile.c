@@ -31,8 +31,10 @@ void __fstr_open_rw(FILE *fp, void *buf, int len)
     fp->write = __fstr_write;
     fp->read = __fstr_read;
     fp->lock_ = -1;
+    fp->wbf_.base_ = (char *)buf;
     fp->wbf_.pos_ = (char *)buf;
     fp->wbf_.end_ = (char *)buf + len;
+    fp->rbf_.base_ = (char *)buf;
     fp->rbf_.pos_ = (char *)buf;
     fp->rbf_.end_ = (char *)buf + len;
 }
@@ -45,6 +47,7 @@ void __fstr_open_ro(FILE *fp, const void *buf, int len)
     fp->write = NULL;
     fp->read = __fstr_read;
     fp->lock_ = -1;
+    fp->rbf_.base_ = (char *)buf;
     fp->rbf_.pos_ = (char *)buf;
     fp->rbf_.end_ = (char *)buf + len;
 }

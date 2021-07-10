@@ -24,10 +24,12 @@
 #include "stdc.h"
 #include <kora/mcrs.h>
 
+#ifndef __NO_SCALL
 FILE __stdio[3];
 FILE *stdin = &__stdio[0];
 FILE *stdout = &__stdio[1];
 FILE *stderr = &__stdio[2];
+#endif
 
 static int _fread(FILE *fp, char *buf, size_t len)
 {
@@ -198,7 +200,7 @@ int fflush_unlocked(FILE *fp)
 
 
 /* Flush a fp */
-int fflush(FILE *fp)
+int _PRT(fflush)(FILE *fp)
 {
     int ret;
 
@@ -217,7 +219,7 @@ int fflush(FILE *fp)
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
 /* Stream close functions */
-int fclose(FILE *fp)
+int _PRT(fclose)(FILE *fp)
 {
     int ret;
     int perm;
@@ -272,7 +274,7 @@ FILE *fvopen(int fd, int oflags)
 
 
 /* Stream open functions */
-FILE *fopen(const char *path, const char *mode)
+FILE *_PRT(fopen)(const char *path, const char *mode)
 {
     int md;
     int fd;
@@ -297,7 +299,7 @@ FILE *fopen(const char *path, const char *mode)
 
 
 /* Create a fp for a opened file */
-FILE *fdopen(int fd, const char *mode)
+FILE *_PRT(fdopen)(int fd, const char *mode)
 {
     int ofs;
 
@@ -379,8 +381,19 @@ size_t fwrite_unlocked(const void *ptr, size_t size, size_t nmemb, FILE *fp)
     return items;
 }
 
+int ungetc_unlocked(int c, FILE *fp)
+{
+    if (fp->rbf_.base_ && fp->rbf_.pos_ > fp->rbf_.base_) {
+        if (fp->rbf_.pos_[-1] == c) {
+            fp->rbf_.pos_--;
+            return c;
+        }
+    }
+    return -1;
+}
+
 /* Binary fp input */
-size_t fread(void *ptr, size_t size, size_t nmemb, FILE *fp)
+size_t _PRT(fread)(void *ptr, size_t size, size_t nmemb, FILE *fp)
 {
     FLOCK(fp);
     size_t items = fread_unlocked(ptr, size, nmemb, fp);
@@ -390,7 +403,7 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *fp)
 
 
 /* Binary fp output */
-size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *fp)
+size_t _PRT(fwrite)(const void *ptr, size_t size, size_t nmemb, FILE *fp)
 {
     FLOCK(fp);
     size_t items = fwrite_unlocked(ptr, size, nmemb, fp);
@@ -401,7 +414,7 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *fp)
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
 
 /* Reposition a fp */
-int fseek(FILE *fp, long offset, int whence)
+int _PRT(fseek)(FILE *fp, long offset, int whence)
 {
     int ret;
     FLOCK(fp);
@@ -421,7 +434,7 @@ int fseek(FILE *fp, long offset, int whence)
 }
 
 /* Reposition a fp */
-long ftell(FILE *fp)
+long _PRT(ftell)(FILE *fp)
 {
     size_t pos = fp->fpos_;
 
@@ -498,7 +511,7 @@ int fwide(FILE *fp, int mode)
 
 
 /* Stream buffering operations */
-int setvbuf(FILE *fp, char *buf, int mode, size_t size)
+int _PRT(setvbuf)(FILE *fp, char *buf, int mode, size_t size)
 {
     fp->lbuf_ = EOF;
     if (mode == _IONBF) {
@@ -517,7 +530,7 @@ int setvbuf(FILE *fp, char *buf, int mode, size_t size)
 }
 
 /* Stream buffering operations */
-void setbuf(FILE *restrict fp, char *restrict buf)
+void _PRT(setbuf)(FILE *restrict fp, char *restrict buf)
 {
     setvbuf(fp, buf, buf ? _IOFBF : _IONBF, BUFSIZ);
 }

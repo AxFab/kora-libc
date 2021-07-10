@@ -1,31 +1,35 @@
 
-// void __errno_location() {}
+void exit(int);
+void printf(const char *, ...);
 
-// void waitpid() {}
+void __ni(const char *func)
+{
+    printf("Not Implemented: %s\n", func);
+    exit(-1);
+}
 
-// void getpid() {}
+#define __NI(n) void n() { __ni(#n); }
+
+__NI(__errno_location)
+__NI(execve)
+__NI(fork)
+__NI(getpid)
+__NI(lstat)
+__NI(remove)
+__NI(waitpid)
+__NI(xtime_read)
+
+__NI(vfwprintf)
+__NI(vfscanf)
+__NI(vfwscanf)
 
 // void lstat() {}
 // void rename() {}
 // void remove() {}
-
-// void xtime_read() {}
-
-
-// void vfwprintf() {}
-// void vfscanf() {}
-// void vfwscanf() {}
-
-
-// void setbuf() {}
-// void setvbuf() {}
-// void ungetc() {}
-// void ungetwc() {}
 
 // void wcscoll() {}
 // void wcsftime() {}
 // void wcsstr() {}
 // void wcstok() {}
 // void wcsxfrm() {}
-
 

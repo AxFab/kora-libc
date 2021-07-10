@@ -12,7 +12,6 @@ void __ni(const char *func)
 
 __NI(waitpid)
 __NI(getpid)
-__NI(ungetc_unlocked)
 __NI(kill)
 __NI(sigaction)
 __NI(vfwprintf)

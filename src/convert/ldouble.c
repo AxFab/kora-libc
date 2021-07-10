@@ -63,3 +63,17 @@ long double __scalbnl(long double x, int n)
     return u.e * 0x1p-128;
 }
 
+long double __scaldcl(long double x, int n)
+{
+    union IEEEl2bits u;
+    u.e = x;
+
+    // Dummy !!
+    long double ex = 1.0;
+    for (; n > 0; --n)
+        ex *= 10.0;
+    for (; n < 0; ++n)
+        ex /= 10.0;
+
+    return u.e * ex;
+}

@@ -82,10 +82,4 @@ static inline int POW2_UP(int val)
 # define EXTAPI
 #endif
 
-#ifndef KORA_PRT
-#  define _PRT(p)  p
-#else
-#  define _PRT(p)  p ## _p
-#endif
-
 #endif  /* _KORA_MCRS_H */

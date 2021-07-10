@@ -20,7 +20,8 @@ gendir ?= $(shell pwd)
 include $(topdir)/make/global.mk
 srcdir = $(topdir)/src
 
-all: libc $(gendir)/lib/libc.a
+all: libc
+static: $(gendir)/lib/libc.a
 # 	crt0
 # crt0: $(libdir)/crt0.o
 install: $(prefix)/lib/libc.so $(prefix)/lib/crt0.o
@@ -40,9 +41,6 @@ SRCS += $(wildcard $(srcdir)/string/*.c)
 SRCS += $(wildcard $(srcdir)/synchro/*.c)
 SRCS += $(wildcard $(srcdir)/xopen/*.c)
 
-SRCS += $(wildcard $(srcdir)/os/$(target_os)/*.c)
-SRCS += $(wildcard $(srcdir)/os/$(target_os)/$(target_arch)/*.$(ASM_EXT))
-
 CFLAGS ?= -Wall -Wextra -Wno-unused-parameter -ggdb
 CFLAGS += -ffreestanding -fPIC
 CFLAGS += -I$(topdir)/include
@@ -52,20 +50,31 @@ CFLAGS += -I$(srcdir)/include/$(target_arch)-$(target_os)
 
 LFLAGS += -lgcc
 
+ifeq ($(NOSCALL),y)
+CFLAGS += -D__NO_SCALL
+else
 -include $(srcdir)/arch/$(target_arch)/make.mk
 # -include $(srcdir)/os/$(target_os)/make.mk
+SRCS += $(wildcard $(srcdir)/os/$(target_os)/*.c)
+SRCS += $(wildcard $(srcdir)/os/$(target_os)/$(target_arch)/*.$(ASM_EXT))
+endif
 
-# SRCS_ck += ${SRCS}
-SRCS_ck += $(wildcard $(srcdir)/convert/*.c)
-SRCS_ck += $(wildcard $(srcdir)/tests/*.c)
+ifeq ($(GCOV),y)
+CFLAGS += -fprofile-arcs -ftest-coverage
+LFLAGS += -coverage
+endif
+
 
 $(gendir)/lib/libc.a:
 	$(V) ar -rc $@ $(call fn_objs,SRCS)
 
-CHECKS += ck_libc
+SRCS_ck += ${SRCS}
+SRCS_ck += $(wildcard $(srcdir)/tests/*.c)
+
+CHECKS += cklc
 
 $(eval $(call link_shared,c,SRCS,LFLAGS))
-$(eval $(call link_bin,ck_libc,SRCS_ck,LFLAGS))
+$(eval $(call link_bin,cklc,SRCS_ck,LFLAGS))
 
 e_dist:
 	@echo $(target_arch)-$(target_os)

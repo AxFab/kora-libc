@@ -31,8 +31,12 @@
 #define _MANT_BITS  64
 #define _MANT_MAX  0x8000000000000000
 
+#define _MDEC_LG  19
+#define _MDEC_DIG 9
+
 long double __copysignl(long double x, long double y);
 long double __scalbnl(long double x, int n);
+long double __scaldcl(long double x, int n);
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -144,7 +148,7 @@ static long double __scan_hex_float(FILE *fp, int bits, int emin, int sign, int 
     // Read digits
     if (c == radix) {
         got_radix = true;
-        for (; c == '0'; c = fgetc_unlocked(fp), exp -= 4)
+        for (c = fgetc_unlocked(fp); c == '0'; c = fgetc_unlocked(fp), exp -= 4)
             got_digit = true;
     }
 
@@ -249,7 +253,84 @@ static long double __scan_hex_float(FILE *fp, int bits, int emin, int sign, int 
 
 static long double __scan_dec_float(FILE *fp, int bits, int emin, int sign, int pok)
 {
-    return 0;
+    int c = fgetc_unlocked(fp);
+    while (c == '0')
+        c = fgetc_unlocked(fp);
+
+    bool got_radix = false;
+    bool got_digit = false;
+    bool got_tail = false;
+    int radix = '.';
+    uint64_t mantisse = 0;
+    long exp = 0;
+    int digits = 0;
+    long double y = 0;
+    long double sc = 1;
+    long double bias = 0;
+
+    // Read digits
+    if (c == radix) {
+        got_radix = true;
+        for (c = fgetc_unlocked(fp); c == '0'; c = fgetc_unlocked(fp), exp--)
+            got_digit = true;
+    }
+
+    for (; ((unsigned)(c - '0') < 10U) || c == radix; c = fgetc_unlocked(fp)) {
+        if (c == radix) {
+            if (got_radix)
+                break;
+            exp = digits;
+            got_radix = true;
+            continue;
+        }
+
+        got_digit = true;
+        int d = c - '0';
+        if (digits < _MDEC_LG)
+            mantisse = mantisse * 10 + d;
+        else if (digits < _MDEC_DIG / 4 + 1) {
+            sc /= 10;
+            y += d * sc;
+        }
+        digits++;
+    }
+
+    // If no digits
+    if (!got_digit) {
+        // REWIND
+        return sign * 0.0;
+    }
+
+    if (!got_radix)
+        exp = digits;
+    while (digits < _MDEC_LG) {
+        mantisse *= 10;
+        digits++;
+    }
+
+    // if ((c|32)=='e') {
+    //     e2 = scanexp(f, pok);
+    //     if (e2 == LLONG_MIN) {
+    //         if (pok) {
+    //             shunget(f);
+    //         } else {
+    //             shlim(f, 0);
+    //             return 0;
+    //         }
+    //         e2 = 0;
+    //     }
+    // } else {
+    //     shunget(f);
+    // }
+
+    // Check 'e'
+    ungetc_unlocked(c, fp);
+    if (!mantisse)
+        return sign * 0.0;
+
+
+
+    return __scaldcl(mantisse, exp - digits);
 }
 
 long double __scan_float(FILE *fp, int bits, int emin, int pok)
@@ -296,8 +377,7 @@ static long double __strtofx(const char *str, char **ptr, int bits, int emin)
     long double y = __scan_float(&fp, bits, emin, 0);
 
     if (ptr) {
-        size_t cnt = 0; // frcount_unlocked(&f);
-        *ptr = (char *)str + cnt;
+        *ptr = (char *)fp.rbf_.pos_;
     }
     return y;
 }

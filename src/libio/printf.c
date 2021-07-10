@@ -32,7 +32,7 @@ int fputc(int c, FILE *stream);
  * which is implemented in another file.
  */
 int vfprintf(FILE *fp, const char *str, va_list ap);
-int vsnprintf(char *str, size_t lg, const char *format, va_list ap);
+int _PRT(vfprintf)(FILE *fp, const char *str, va_list ap);
 int write(int, const char *, size_t);
 
 /* Write on a string streaming */
@@ -66,34 +66,15 @@ int vprintf(const char *format, va_list ap)
 /* Write formated string on an opened file */
 int fprintf(FILE *fp, const char *format, ...)
 {
-    int ret;
     va_list ap;
     va_start(ap, format);
-    ret = vfprintf(fp, format, ap);
+    int ret = vfprintf(fp, format, ap);
     va_end(ap);
     return ret;
 }
 
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
-
-/* Write formated string from a file descriptor */
-int dprintf(int fd, const char *format, ...)
-{
-    int ret;
-    va_list ap;
-    FILE fp;
-
-    fp.fd_ = fd;
-    fp.lbuf_ = EOF;
-    fp.write = _dwrite;
-    fp.lock_ = -1;
-
-    va_start(ap, format);
-    ret = vfprintf(&fp, format, ap);
-    va_end(ap);
-    return ret;
-}
 
 /* Write formated string from a file descriptor */
 int vdprintf(int fd, const char *format, va_list ap)
@@ -105,10 +86,42 @@ int vdprintf(int fd, const char *format, va_list ap)
     fp.write = _dwrite;
     fp.lock_ = -1;
 
-    return vfprintf(&fp, format, ap);
+    return _PRT(vfprintf)(&fp, format, ap);
+}
+
+/* Write formated string from a file descriptor */
+int dprintf(int fd, const char *format, ...)
+{
+    va_list ap;
+    va_start(ap, format);
+    int ret = vdprintf(fd, format, ap);
+    va_end(ap);
+    return ret;
 }
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */
+
+/* Write formated string from a string */
+int vsnprintf(char *str, size_t lg, const char *format, va_list ap)
+{
+    char b;
+    int res;
+    FILE fp;
+    __fstr_open_rw(&fp, str, lg);
+
+    if (lg - 1 > INT_MAX - 1) {
+        errno = EOVERFLOW;
+        return -1;
+    } else if (!lg) {
+        fp.wbf_.pos_ = &b;
+        fp.wbf_.end_ = fp.wbf_.pos_++;
+    } else if (fp.wbf_.end_ < fp.wbf_.pos_)
+        fp.wbf_.end_ = (char *)SIZE_MAX;
+
+    res = _PRT(vfprintf)(&fp, format, ap);
+    fputc('\0', &fp);
+    return res;
+}
 
 /* Write formated string from a string */
 int sprintf(char *str, const char *format, ...)
@@ -136,28 +149,6 @@ int snprintf(char *str, size_t lg, const char *format, ...)
 int vsprintf(char *str, const char *format, va_list ap)
 {
     return vsnprintf(str, INT_MAX, format, ap);
-}
-
-/* Write formated string from a string */
-int vsnprintf(char *str, size_t lg, const char *format, va_list ap)
-{
-    char b;
-    int res;
-    FILE fp;
-    __fstr_open_rw(&fp, str, lg);
-
-    if (lg - 1 > INT_MAX - 1) {
-        errno = EOVERFLOW;
-        return -1;
-    } else if (!lg) {
-        fp.wbf_.pos_ = &b;
-        fp.wbf_.end_ = fp.wbf_.pos_++;
-    } else if (fp.wbf_.end_ < fp.wbf_.pos_)
-        fp.wbf_.end_ = (char *)SIZE_MAX;
-
-    res = vfprintf(&fp, format, ap);
-    fputc('\0', &fp);
-    return res;
 }
 
 /* -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- */

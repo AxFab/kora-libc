@@ -65,7 +65,7 @@ int __putenv(char *s, size_t l, char *r)
 }
 
 
-int setenv(const char *var, const char *value, int overwrite)
+int _PRT(setenv)(const char *var, const char *value, int overwrite)
 {
     char *s;
     size_t l1, l2;
@@ -88,7 +88,7 @@ int setenv(const char *var, const char *value, int overwrite)
 }
 
 
-int putenv(char *s)
+int _PRT(putenv)(char *s)
 {
     size_t l = strchrnul(s, '=') - s;
     if (!l || !s[l])
@@ -97,7 +97,7 @@ int putenv(char *s)
 }
 
 
-char *getenv(const char *name)
+char *_PRT(getenv)(const char *name)
 {
     size_t l = strchrnul(name, '=') - name;
     if (l && !name[l] && __environ)
@@ -107,7 +107,7 @@ char *getenv(const char *name)
     return 0;
 }
 
-int clearenv()
+int _PRT(clearenv)()
 {
     char **e = __environ;
     __environ = 0;
@@ -117,7 +117,7 @@ int clearenv()
     return 0;
 }
 
-int unsetenv(const char *name)
+int _PRT(unsetenv)(const char *name)
 {
     size_t l = strchrnul(name, '=') - name;
     if (!l || name[l]) {
@@ -139,7 +139,7 @@ int unsetenv(const char *name)
     return 0;
 }
 
-char *secure_getenv(const char *name)
+char *_PRT(secure_getenv)(const char *name)
 {
     return NULL;
 }
