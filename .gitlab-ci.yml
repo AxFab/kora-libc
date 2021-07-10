@@ -3,6 +3,8 @@
 
 build:
   stage: build
+  before_script:
+    - apt-get install -y nasm
   script:
     - make clean
     - make

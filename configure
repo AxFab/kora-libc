@@ -71,7 +71,9 @@ if [ "$TARGET" != "`$TOPDIR/make/host.sh`" ]; then
             2) CROSS="$SYSDIR/usr/bin/$T_ARCH-$T_OS-"; CC='gcc'; ;;
             3) CROSS="$PREFIX/bin/$T_ARCH-$T_OS-"; CC='gcc'; ;;
             4) CROSS="$PREFIX/usr/bin/$T_ARCH-$T_OS-"; CC='gcc'; ;;
-            5)
+            5) CROSS="$SYSDIR/opt/bin/$T_ARCH-$T_OS-"; CC='gcc'; ;;
+            6) CROSS="$PREFIX/opt/bin/$T_ARCH-$T_OS-"; CC='gcc'; ;;
+            7)
                 CROSS=''; CC='';
                 echo "Unable to find toolchain for target $TARGET"  >&2
                 exit 1 ;;
