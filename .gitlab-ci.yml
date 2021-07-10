@@ -37,13 +37,13 @@ deploy:
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-build_kora:
-  stage: build
-  image: axfab/kora-gcc:latest
-  script:
-    - mkdir build
-    - cd build && ../configure --target=i386-kora
-    - cd build && make
-  artifacts:
-    paths:
-      - build/lib/libc.so
+# build_kora:
+#   stage: build
+#   image: axfab/kora-gcc:latest
+#   script:
+#     - mkdir build
+#     - cd build && ../configure --target=i386-kora
+#     - cd build && make
+#   artifacts:
+#     paths:
+#       - build/lib/libc.so

@@ -35,3 +35,4 @@
 
 # Ressouces
 !resx/**/*
+!spec/symbols.csv
