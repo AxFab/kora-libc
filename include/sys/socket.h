@@ -3,12 +3,12 @@
 #define _SYS_SOCKET_H 1
 
 #include <bits/cdefs.h>
-#include <sys/types.h>
+#include <bits/types.h>
 // #include <sys/uio.h>
 
 __STDC_GUARD
 
-typedef int socklen_t;
+typedef __socklen_t socklen_t;
 typedef unsigned sa_family_t;
 
 struct sockaddr {

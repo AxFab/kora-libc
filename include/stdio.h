@@ -180,8 +180,8 @@ int fputs_unlocked(const char *str, FILE *stream);
 # define ftello64 ftello
 # define fgetpos64 fgetpos
 # define fsetpos64 fsetpos
-# define fpos64_t fpos_t
-# define off64_t __off_t
+typedef __fpos64_t fpos64_t;
+typedef __off64_t off64_t;
 #endif
 
 

@@ -192,7 +192,6 @@ typedef unsigned long int __rlim64_t;
 typedef long int __blkcnt64_t;
 typedef unsigned long int __fsblkcnt64_t;
 typedef unsigned long int __fsfilcnt64_t;
-typedef __off64_t __loff_t;
 
 #else
 
@@ -202,9 +201,11 @@ typedef unsigned long long int __rlim64_t;
 typedef long long int __blkcnt64_t;
 typedef unsigned long long int __fsblkcnt64_t;
 typedef unsigned long long int __fsfilcnt64_t;
-typedef __off64_t __loff_t;
 
 #endif  /* Datatypes 64 */
+
+typedef __off64_t __fpos64_t;
+typedef __off64_t __loff_t;
 
 
 #endif  /* __BITS_TYPES_H */

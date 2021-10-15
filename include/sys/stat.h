@@ -46,8 +46,8 @@ int mkfifoat(int fd, const char *path, __mode_t mode);
 #define blkcnt64_t __blkcnt_t
 #define fsblkcnt64_t __fsblkcnt_t
 #define fsfilcnt64_t __fsfilcnt_t
-#define ino64_t __ino_t
-#define off64_t __off_t
+typedef __fpos64_t fpos64_t;
+typedef __off64_t off64_t;
 #endif
 
 __STDC_END
