@@ -21,7 +21,6 @@
 #include <fcntl.h>
 #include <malloc.h>
 #include <sys/syscall.h>
-#include <kora/syscalls.h>
 
 int close(int fd);
 

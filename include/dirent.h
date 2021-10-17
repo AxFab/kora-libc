@@ -30,7 +30,7 @@
 #include <bits/types.h>
 // #include <bits/posix1_lim.h>
 #include <stddef.h>
-#include <kora/syscalls.h>
+#include <sys/syscall.h>
 
 // struct dirent {
 //     __ino_t d_ino;

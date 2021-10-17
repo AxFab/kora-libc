@@ -22,7 +22,6 @@
 #include <kora/splock.h>
 #include <kora/mcrs.h>
 #include <sys/syscall.h>
-#include <kora/syscalls.h>
 #include <sys/mman.h>
 #include <string.h>
 #include <errno.h>

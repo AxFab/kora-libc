@@ -35,8 +35,12 @@ __ssize_t sendto(int sock, const void * buf, size_t len, int flags, const struct
     return -1;
 }
 
-// int accept(int, struct sockaddr *restrict, socklen_t *restrict);
-// int bind(int, const struct sockaddr *, socklen_t);
+int bind(int sock, const struct sockaddr *addr, socklen_t alen)
+{
+    return -1;
+}
+
+// int accept(int, struct sockaddr *restrict, socklen_t *restrict)
 // int connect(int, const struct sockaddr *, socklen_t);
 // int getpeername(int, struct sockaddr *restrict, socklen_t *restrict);
 // int getsockname(int, struct sockaddr *restrict, socklen_t *restrict);

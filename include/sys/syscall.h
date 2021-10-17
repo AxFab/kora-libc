@@ -21,6 +21,7 @@
 #define __SYS_SYSCALL_H 1
 
 #include <stddef.h>
+#include <bits/syscall.h>
 
 int __syscall0(int no, ...);
 int __syscall1(int no, ...);
