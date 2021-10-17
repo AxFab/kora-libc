@@ -283,7 +283,7 @@ if [ ! -f "${PREFIX}/bin/${TARGET}-gcc" ]; then
     mkdir -p include
     cp -rpvR ${SCRIPT_HOME}/include .
     cp -rpvR ${SCRIPT_HOME}/src/include/i386/* include/
-    cp -rpvR ${SCRIPT_HOME}/src/include/i386/* include/
+    cp -rpvR ${SCRIPT_HOME}/src/include/kora/* include/
 
     $BUILD gcc;
 fi
