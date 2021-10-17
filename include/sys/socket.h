@@ -1,21 +1,97 @@
+/*
+ *      This file is part of the KoraOS project.
+ *  Copyright (C) 2015-2021  <Fabien Bavent>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *   - - - - - - - - - - - - - - -
+ */
 
 #ifndef _SYS_SOCKET_H
 #define _SYS_SOCKET_H 1
 
 #include <bits/cdefs.h>
 #include <bits/types.h>
+#include <stdint.h>
 // #include <sys/uio.h>
 
 __STDC_GUARD
 
 typedef __socklen_t socklen_t;
-typedef unsigned sa_family_t;
 
 struct sockaddr {
-    unsigned short sa_family;
-    unsigned short sa_port;
-    char sa_data[12];
+    short sin_family;
+    char sin_addr[14];
 };
+
+// IPv4 Socket address
+struct in_addr {
+    union {
+        struct {
+            unsigned char s_b1, s_b2, s_b3, s_b4;
+        } S_un_b;
+        struct {
+            unsigned short s_w1, s_w2;
+        } S_un_w;
+        unsigned long S_addr;
+    } S_un;
+#define s_addr  S_un.S_addr /* can be used for most tcp & ip code */
+#define s_host  S_un.S_un_b.s_b2    // host on imp
+#define s_net   S_un.S_un_b.s_b1    // network
+#define s_imp   S_un.S_un_w.s_w2    // imp
+#define s_impno S_un.S_un_b.s_b4    // imp #
+#define s_lh    S_un.S_un_b.s_b3    // logical host
+};
+
+struct sockaddr_in {
+    short sin_family;
+    unsigned short sin_port;
+    struct in_addr sin_addr;
+    char sin_zero[8];
+};
+
+
+// Definitions of bits in internet IPv4 address.
+#define IN_CLASSA(i)  (((long)(i) & 0x80000000) == 0)
+#define IN_CLASSA_NET  0xff000000
+#define IN_CLASSA_NSHIFT  24
+#define IN_CLASSA_HOST  0x00ffffff
+#define IN_CLASSA_MAX  128
+
+#define IN_CLASSB(i)  (((long)(i) & 0xc0000000) == 0x80000000)
+#define IN_CLASSB_NET  0xffff0000
+#define IN_CLASSB_NSHIFT  16
+#define IN_CLASSB_HOST  0x0000ffff
+#define IN_CLASSB_MAX  65536
+
+#define IN_CLASSC(i)  (((long)(i) & 0xe0000000) == 0xc0000000)
+#define IN_CLASSC_NET  0xffffff00
+#define IN_CLASSC_NSHIFT  8
+#define IN_CLASSC_HOST  0x000000ff
+
+#define IN_CLASSD(i)  (((long)(i) & 0xf0000000) == 0xe0000000)
+#define IN_CLASSD_NET  0xf0000000
+#define IN_CLASSD_NSHIFT  28
+#define IN_CLASSD_HOST  0x0fffffff
+#define IN_MULTICAST(i)  IN_CLASSD(i)
+
+#define INADDR_ANY  0x00000000UL
+#define INADDR_LOOPBACK  0x7f000001UL
+#define INADDR_BROADCAST  0xffffffffUL
+#define INADDR_NONE  0xffffffffUL
+
+
 
 // struct sockaddr_storage
 // struct msghdr
@@ -109,12 +185,12 @@ int getpeername(int, struct sockaddr *restrict, socklen_t *restrict);
 int getsockname(int, struct sockaddr *restrict, socklen_t *restrict);
 int getsockopt(int, int, int, void *restrict, socklen_t *restrict);
 int listen(int, int);
-ssize_t recv(int, void *, size_t, int);
-ssize_t recvfrom(int, void *restrict, size_t, int, struct sockaddr *restrict, socklen_t *restrict);
-ssize_t recvmsg(int, struct msghdr *, int);
-ssize_t send(int, const void *, size_t, int);
-ssize_t sendmsg(int, const struct msghdr *, int);
-ssize_t sendto(int, const void *, size_t, int, const struct sockaddr *, socklen_t);
+__ssize_t recv(int, void *, size_t, int);
+__ssize_t recvfrom(int, void *restrict, size_t, int, struct sockaddr *restrict, socklen_t *restrict);
+__ssize_t recvmsg(int, struct msghdr *, int);
+__ssize_t send(int, const void *, size_t, int);
+__ssize_t sendmsg(int, const struct msghdr *, int);
+__ssize_t sendto(int, const void *, size_t, int, const struct sockaddr *, socklen_t);
 int setsockopt(int, int, int, const void *, socklen_t);
 int shutdown(int, int);
 int sockatmark(int);
@@ -122,6 +198,13 @@ int socket(int, int, int);
 int socketpair(int, int, int, int [2]);
 
 int open_socket(int, struct sockaddr *, socklen_t);
+
+
+uint32_t htonl(uint32_t hostlong);
+uint16_t htons(uint16_t hostshort);
+uint32_t ntohl(uint32_t netlong);
+uint16_t ntohs(uint16_t netshort);
+
 
 typedef enum {
     NPROTO_TCP           = 1, // Ipv4 TCP

@@ -1,7 +1,23 @@
+;      This file is part of the KoraOS project.
+;  Copyright (C) 2015-2021  <Fabien Bavent>
+;
+;  This program is free software: you can redistribute it and/or modify
+;  it under the terms of the GNU Affero General Public License as
+;  published by the Free Software Foundation, either version 3 of the
+;  License, or (at your option) any later version.
+;
+;  This program is distributed in the hope that it will be useful,
+;  but WITHOUT ANY WARRANTY; without even the implied warranty of
+;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;  GNU Affero General Public License for more details.
+;
+;  You should have received a copy of the GNU Affero General Public License
+;  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+; -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 use32
 
 global _start
-extern __libc_init, __libc_fini, _main, exit
+extern __libc_init, __libc_fini, main, exit
 extern _GLOBAL_OFFSET_TABLE_
 
 %macro  get_GOT 0
@@ -29,7 +45,7 @@ _start:
     mov [esp + 4], eax
     mov eax, [ebp + 12] ; env
     mov [esp + 8], eax
-    call _main
+    call main
     mov [esp], eax
 
     get_GOT

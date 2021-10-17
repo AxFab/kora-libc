@@ -1,0 +1,144 @@
+diff --git a/bfd/config.bfd b/bfd/config.bfd
+index f04a993f..282e2cc5 100644
+--- a/bfd/config.bfd
++++ b/bfd/config.bfd
+@@ -269,6 +269,11 @@ case "${targ}" in
+     targ_selvecs=aarch64_elf64_be_cloudabi_vec
+     want64=true
+     ;;
++  aarch64-*-kora*)
++    targ_defvec=aarch64_elf64_le_vec
++    targ_selvecs=aarch64_elf32_le_vec
++    want64=true
++    ;;
+   aarch64-*-linux*)
+     targ_defvec=aarch64_elf64_le_vec
+     targ_selvecs="aarch64_elf64_be_vec aarch64_elf32_le_vec aarch64_elf32_be_vec arm_elf32_le_vec arm_elf32_be_vec"
+@@ -442,6 +447,10 @@ case "${targ}" in
+     targ_defvec=arm_elf32_le_vec
+     targ_selvecs=arm_elf32_be_vec
+     ;;
++  arm-*-kora*)
++    targ_defvec=arm_elf32_le_vec
++    targ_selvecs=
++    ;;
+   arm-*-elf | arm*-*-freebsd* | arm*-*-linux-* | arm*-*-conix* | \
+   arm*-*-uclinux* | arm-*-kfreebsd*-gnu | \
+   arm*-*-eabi* | arm-*-rtems*)
+@@ -653,6 +662,11 @@ case "${targ}" in
+     targ_defvec=i386_elf32_vec
+     targ_selvecs=i386_elf32_vec
+     ;;
++  i[3-7]86-*-kora*)
++    targ_defvec=i386_elf32_vec
++    targ_selvecs=
++    targ64_selvecs=x86_64_elf64_vec
++    ;;
+   i[3-7]86-*-nto*)
+     targ_defvec=i386_elf32_vec
+     targ_selvecs="iamcu_elf32_vec i386_coff_vec"
+@@ -778,6 +792,11 @@ case "${targ}" in
+     targ_selvecs="i386_elf32_vec iamcu_elf32_vec x86_64_elf32_vec l1om_elf64_vec k1om_elf64_vec"
+     want64=true
+     ;;
++  x86_64-*-kora-*)
++    targ_defvec=x86_64_elf64_vec
++    targ_selvecs=i386_elf32_vec
++    want64=true
++    ;;
+   x86_64-*-dragonfly*)
+     targ_defvec=x86_64_elf64_vec
+     targ_selvecs="i386_elf32_vec iamcu_elf32_vec l1om_elf64_vec k1om_elf64_vec"
+diff --git a/config.sub b/config.sub
+index f2632cd8..2319a1b6 100755
+--- a/config.sub
++++ b/config.sub
+@@ -1415,7 +1415,7 @@ case $os in
+ 	      | -os2* | -vos* | -palmos* | -uclinux* | -nucleus* \
+ 	      | -morphos* | -superux* | -rtmk* | -rtmk-nova* | -windiss* \
+ 	      | -powermax* | -dnix* | -nx6 | -nx7 | -sei* | -dragonfly* \
+-	      | -skyos* | -haiku* | -rdos* | -toppers* | -drops* | -es* \
++	      | -skyos* | -haiku* | -rdos* | -toppers* | -drops* | -es* | -kora* \
+ 	      | -onefs* | -tirtos* | -phoenix* | -fuchsia* | -redox* | -bme*)
+ 	# Remember, each alternative MUST END IN *, to match a version number.
+ 		;;
+diff --git a/gas/configure.tgt b/gas/configure.tgt
+index afe4e060..3ff40e63 100644
+--- a/gas/configure.tgt
++++ b/gas/configure.tgt
+@@ -126,6 +126,7 @@ generic_target=${cpu_type}-$vendor-$os
+ case ${generic_target} in
+   aarch64*-*-elf*)			fmt=elf;;
+   aarch64*-*-fuchsia*)			fmt=elf;;
++  aarch64*-*-kora*)			fmt=elf ;;
+   aarch64*-*-linux*)			fmt=elf em=linux
+     case ${cpu}-${os} in
+       aarch64*-linux-gnu_ilp32)		arch=aarch64:32 ;;
+@@ -147,6 +148,7 @@ case ${generic_target} in
+   arm-*-eabi* | arm-*-rtems*)		fmt=elf em=armeabi ;;
+   arm-*-symbianelf*)			fmt=elf em=symbian ;;
+   arm-*-kaos*)				fmt=elf ;;
++  arm-*-kora)				fmt=elf ;;
+   arm-*-conix*)				fmt=elf ;;
+   arm-*-freebsd[89].* | armeb-*-freebsd[89].*)
+ 					fmt=elf  em=freebsd ;;
+@@ -226,6 +228,7 @@ case ${generic_target} in
+   i386-*-coff)				fmt=coff ;;
+   i386-*-elfiamcu)			fmt=elf arch=iamcu ;;
+   i386-*-elf*)				fmt=elf ;;
++  i386-*-kora*)				fmt=elf ;;
+   i386-*-fuchsia*)			fmt=elf ;;
+   i386-*-kaos*)				fmt=elf ;;
+   i386-*-bsd*)				fmt=aout em=386bsd ;;
+diff --git a/ld/configure.tgt b/ld/configure.tgt
+index 6183a85b..92812e67 100644
+--- a/ld/configure.tgt
++++ b/ld/configure.tgt
+@@ -56,6 +56,8 @@ aarch64-*-freebsd*)	targ_emul=aarch64fbsd
+ 			targ_extra_emuls="aarch64fbsdb aarch64elf" ;;
+ aarch64-*-fuchsia*)	targ_emul=aarch64elf
+ 			targ_extra_emuls="aarch64elfb armelf armelfb" ;;
++aarch64-*-kora*)	targ_emul=aarch64elf
++			targ_extra_emuls="aarch64elfb armelf armelfb" ;;
+ aarch64_be-*-linux-gnu_ilp32)
+ 			targ_emul=aarch64linux32b
+ 			targ_extra_libpath="aarch64linuxb aarch64linux aarch64linux32 armelfb_linux_eabi armelf_linux_eabi"
+@@ -112,6 +114,8 @@ arm*b-*-freebsd*)	targ_emul=armelfb_fbsd
+ arm*-*-freebsd* | arm-*-kfreebsd*-gnu)
+ 			targ_emul=armelf_fbsd
+ 			targ_extra_emuls="armelfb_fbsd armelf" ;;
++arm*-*-kora*)		targ_emul=armelf
++			targ_extra_emuls=armelfb ;;
+ armeb-*-netbsdelf*)	targ_emul=armelfb_nbsd;
+ 			targ_extra_emuls="armelf_nbsd armelf armnbsd" ;;
+ arm-*-netbsdelf*)	targ_emul=armelf_nbsd;
+@@ -260,6 +264,9 @@ i[3-7]86-*-bsd)		targ_emul=i386bsd ;;
+ i[3-7]86-*-bsd386)	targ_emul=i386bsd ;;
+ i[3-7]86-*-bsdi*)	targ_emul=i386bsd ;;
+ i[3-7]86-*-aout)	targ_emul=i386aout ;;
++i[3-7]86-*-kora*)	targ_emul=elf_i386
++			targ_extra_emuls=elf_i386
++			targ64_extra_emuls=elf_x86_64 ;;
+ i[3-7]86-*-linux*aout*)	targ_emul=i386linux
+ 			targ_extra_emuls="elf_i386 elf_iamcu"
+ 			tdir_elf_iamcu=`echo ${targ_alias} | sed -e 's/aout//'`
+@@ -271,6 +278,8 @@ i[3-7]86-*-linux-*)	targ_emul=elf_i386
+ 			targ64_extra_emuls="elf_x86_64 elf32_x86_64 elf_l1om elf_k1om"
+ 			targ64_extra_libpath="elf_x86_64 elf32_x86_64"
+ 			tdir_i386linux=${targ_alias}aout ;;
++x86_64-*-kora*) 	targ_emul=elf_x86_64
++			targ_extra_emuls=elf_i386 ;;
+ x86_64-*-linux-gnux32)	targ_emul=elf32_x86_64
+ 			targ_extra_emuls="elf_x86_64 elf_i386 elf_iamcu i386linux elf_l1om elf_k1om"
+ 			targ_extra_libpath="elf_i386 elf_iamcu elf_x86_64 elf_l1om elf_k1om"
+@@ -899,6 +908,10 @@ case "${target}" in
+   NATIVE_LIB_DIRS='/lib /usr/lib /usr/local/lib'
+   ;;
+ 
++*-*-kora*)
++  NATIVE_LIB_DIRS='/usr/apk/lib /usr/local/lib /usr/lib /lib'
++  ;;
++
+ hppa*64*-*-hpux11*)
+   NATIVE_LIB_DIRS=/usr/lib/pa20_64
+   ;;

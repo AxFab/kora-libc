@@ -1,6 +1,6 @@
 /*
  *      This file is part of the KoraOS project.
- *  Copyright (C) 2015-2019  <Fabien Bavent>
+ *  Copyright (C) 2015-2021  <Fabien Bavent>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -376,9 +376,8 @@ static long double __strtofx(const char *str, char **ptr, int bits, int emin)
 
     long double y = __scan_float(&fp, bits, emin, 0);
 
-    if (ptr) {
+    if (ptr)
         *ptr = (char *)fp.rbf_.pos_;
-    }
     return y;
 }
 
@@ -401,4 +400,3 @@ double atof(const char *str)
 {
     return __strtofx(str, NULL, DBL_MANT_DIG, DBL_MIN_EXP - DBL_MANT_DIG);
 }
-

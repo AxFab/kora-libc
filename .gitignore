@@ -36,3 +36,4 @@
 # Ressouces
 !resx/**/*
 !spec/symbols.csv
+!make/patches/*.patch

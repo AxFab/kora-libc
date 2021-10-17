@@ -1,6 +1,6 @@
 /*
  *      This file is part of the KoraOS project.
- *  Copyright (C) 2015-2019  <Fabien Bavent>
+ *  Copyright (C) 2015-2021  <Fabien Bavent>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -433,4 +433,3 @@ size_t strxfrm(char *dest, const char *src, size_t n)
 {
     return strxfrm_l(dest, src, n, __current_locale());
 }
-

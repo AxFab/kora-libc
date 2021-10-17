@@ -1,5 +1,5 @@
 #      This file is part of the KoraOS project.
-#  Copyright (C) 2018  <Fabien Bavent>
+#  Copyright (C) 2015-2021  <Fabien Bavent>
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU Affero General Public License as
@@ -24,7 +24,7 @@ all: libc
 static: $(gendir)/lib/libc.a
 # 	crt0
 # crt0: $(libdir)/crt0.o
-install: $(prefix)/lib/libc.so $(prefix)/lib/crt0.o
+install: $(prefix)/lib/libc.so $(prefix)/lib/crt0.o install-headers
 # install-headers:
 # 	$(V) cp -r $(topdir)/include $(prefix)/include
 # 	$(V) cp -r $(topdir)/arch/$(target_arch)/include $(prefix)/include/$(target_arch)-$(target_os)
@@ -32,47 +32,51 @@ install: $(prefix)/lib/libc.so $(prefix)/lib/crt0.o
 include $(topdir)/make/build.mk
 include $(topdir)/make/check.mk
 
-SRCS += $(wildcard $(srcdir)/c89/*.c)
-SRCS += $(wildcard $(srcdir)/convert/*.c)
-SRCS += $(wildcard $(srcdir)/libio/*.c)
-SRCS += $(wildcard $(srcdir)/misc/*.c)
-SRCS += $(wildcard $(srcdir)/posix/*.c)
-SRCS += $(wildcard $(srcdir)/string/*.c)
-SRCS += $(wildcard $(srcdir)/synchro/*.c)
-SRCS += $(wildcard $(srcdir)/xopen/*.c)
-
 CFLAGS ?= -Wall -Wextra -Wno-unused-parameter -ggdb
-CFLAGS += -ffreestanding -fPIC
-CFLAGS += -I$(topdir)/include
-CFLAGS += -I$(srcdir)/include/$(target_arch)
-CFLAGS += -I$(srcdir)/include/$(target_os)
-CFLAGS += -I$(srcdir)/include/$(target_arch)-$(target_os)
 
-LFLAGS += -lgcc
+SRCS_c += $(wildcard $(srcdir)/c89/*.c)
+SRCS_c += $(wildcard $(srcdir)/convert/*.c)
+SRCS_c += $(wildcard $(srcdir)/libio/*.c)
+SRCS_c += $(wildcard $(srcdir)/misc/*.c)
+SRCS_c += $(wildcard $(srcdir)/posix/*.c)
+SRCS_c += $(wildcard $(srcdir)/string/*.c)
+SRCS_c += $(wildcard $(srcdir)/synchro/*.c)
+SRCS_c += $(wildcard $(srcdir)/xopen/*.c)
+SRCS_c += $(wildcard $(srcdir)/net/*.c)
+
+CFLAGS_c += $(CFLAGS)
+CFLAGS_c += -ffreestanding -fPIC
+CFLAGS_c += -I$(topdir)/include
+CFLAGS_c += -I$(srcdir)/include/$(target_arch)
+CFLAGS_c += -I$(srcdir)/include/$(target_os)
+CFLAGS_c += -I$(srcdir)/include/$(target_arch)-$(target_os)
+
+LFLAGS_c += -lgcc
 
 ifeq ($(NOSCALL),y)
-CFLAGS += -D__NO_SCALL
+CFLAGS_c += -D__NO_SCALL
 else
 -include $(srcdir)/arch/$(target_arch)/make.mk
 # -include $(srcdir)/os/$(target_os)/make.mk
-SRCS += $(wildcard $(srcdir)/os/$(target_os)/*.c)
-SRCS += $(wildcard $(srcdir)/os/$(target_os)/$(target_arch)/*.$(ASM_EXT))
+SRCS_c += $(wildcard $(srcdir)/os/$(target_os)/*.c)
+SRCS_c += $(wildcard $(srcdir)/os/$(target_os)/$(target_arch)/*.$(ASM_EXT))
 endif
 
 ifeq ($(GCOV),y)
-CFLAGS += -fprofile-arcs -ftest-coverage
-LFLAGS += -coverage
+CFLAGS_c += -fprofile-arcs -ftest-coverage
+LFLAGS_c += -coverage
 endif
 
 $(gendir)/lib/libc.a:
-	$(V) ar -rc $@ $(call fn_objs,SRCS)
+	$(V) ar -rc $@ $(call fn_objs,SRCS_c,c)
 
-SRCS_ck += ${SRCS}
+SRCS_ck += ${SRCS_c}
 SRCS_ck += $(wildcard $(srcdir)/tests/*.c)
 
 
-$(eval $(call link_shared,c,SRCS,LFLAGS))
-$(eval $(call link_bin,cklc,SRCS_ck,LFLAGS))
+$(eval $(call comp_source,c,CFLAGS_c))
+$(eval $(call link_shared,c,SRCS_c,LFLAGS_c,c))
+$(eval $(call link_bin,cklc,SRCS_ck,LFLAGS_c,c))
 
 CHECKS += cklc
 
@@ -81,8 +85,38 @@ e_dist:
 e_srcs:
 	@echo $(SRCS)
 
+
+HDRS = $(wildcard $(topdir)/include/*.h)
+HDRS += $(wildcard $(topdir)/include/sys/*.h)
+HDRS += $(wildcard $(topdir)/include/bits/*.h)
+HDRS += $(wildcard $(topdir)/include/bits/cdefs/*.h)
+HDRS += $(wildcard $(topdir)/src/include/$(target_os)/bits/*.h)
+HDRS += $(wildcard $(topdir)/src/include/$(target_arch)/bits/*.h)
+
+HDRS_o = $(patsubst $(topdir)/include/%,$(prefix)/include/%, \
+	$(patsubst $(topdir)/src/include/$(target_os)/%,$(prefix)/include/%, \
+	$(patsubst $(topdir)/src/include/$(target_arch)/%,$(prefix)/include/%, \
+	$(HDRS))))
+
+install-headers: $(HDRS_o)
+
+$(prefix)/include/%.h: $(topdir)/include/%.h
+	$(S) mkdir -p $(dir $@)
+	$(V) cp -vrP $< $@
+
+$(prefix)/include/%.h: $(topdir)/src/include/$(target_os)/%.h
+	$(S) mkdir -p $(dir $@)
+	$(V) cp -vrP $< $@
+
+$(prefix)/include/%.h: $(topdir)/src/include/$(target_arch)/%.h
+	$(S) mkdir -p $(dir $@)
+	$(V) cp -vrP $< $@
+
+
+
 check: $(patsubst %,val_%,$(CHECKS))
 
 ifeq ($(NODEPS),)
-include $(call fn_deps,SRCS)
+-include $(call fn_deps,SRCS_c,c)
+-include $(call fn_deps,SRCS_ck,c)
 endif

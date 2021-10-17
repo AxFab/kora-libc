@@ -1,6 +1,6 @@
 /*
  *      This file is part of the KoraOS project.
- *  Copyright (C) 2015-2019  <Fabien Bavent>
+ *  Copyright (C) 2015-2021  <Fabien Bavent>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -199,6 +199,10 @@ void readlink()
 {
 }
 
+void unlink()
+{
+}
+
 
 time_t time(time_t *ptr)
 {
@@ -216,5 +220,16 @@ xtime_t xtime_read(int name)
     xtime_t value = 0;
     syscall(SYS_XTIME, name, &value);
     return value;
+}
+
+
+int shm_open(const char *name, int oflag, __mode_t mode)
+{
+    return -1;
+}
+
+int shm_unlink(const char *name)
+{
+    return -1;
 }
 
