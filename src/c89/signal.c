@@ -20,8 +20,8 @@
 #include <signal.h>
 #include <unistd.h>
 
-sigset_t __sigset_all = ~0ULL;
-sigset_t __sigset_app = ~0ULL;
+sigset_t __sigset_all = (sigset_t)(~0ULL);
+sigset_t __sigset_app = (sigset_t)(~0ULL);
 
 sighandler_t signal(int signum, sighandler_t handler)
 {

@@ -177,6 +177,16 @@ struct sockaddr_in {
 
 
 
+struct msghdr {
+    void *msg_name; /* Optional address */
+    socklen_t msg_namelen; /* Size of address */
+    struct iovec *msg_iov; /* Scatter/gather array */
+    size_t msg_iovlen; /* # elements in msg_iov */
+    void *msg_control; /* Ancillary data, see below */
+    size_t msg_controllen; /* Ancillary data buffer len */
+    int msg_flags; /* Flags on received message */
+};
+
 
 int accept(int, struct sockaddr *restrict, socklen_t *restrict);
 int bind(int, const struct sockaddr *, socklen_t);

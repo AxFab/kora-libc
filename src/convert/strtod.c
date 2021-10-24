@@ -259,14 +259,14 @@ static long double __scan_dec_float(FILE *fp, int bits, int emin, int sign, int 
 
     bool got_radix = false;
     bool got_digit = false;
-    bool got_tail = false;
+    // bool got_tail = false;
     int radix = '.';
     uint64_t mantisse = 0;
     long exp = 0;
     int digits = 0;
     long double y = 0;
     long double sc = 1;
-    long double bias = 0;
+    // long double bias = 0;
 
     // Read digits
     if (c == radix) {

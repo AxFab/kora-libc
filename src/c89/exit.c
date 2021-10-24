@@ -105,7 +105,7 @@ _Noreturn void abort(void)
     raise(SIGABRT);
 
     // If we return we need to reset the handler
-    sigset_t all = ~0ULL;
+    sigset_t all = (sigset_t)(~0ULL);
     sigprocmask(SIG_BLOCK, &all, NULL);
 
     __lock(&__abort_lock);

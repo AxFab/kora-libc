@@ -23,6 +23,8 @@
 #include <kora/mcrs.h>
 #include <sys/syscall.h>
 #include <sys/mman.h>
+#include <sys/time.h>
+#include <sys/vfs.h>
 #include <string.h>
 #include <errno.h>
 #include <time.h>
@@ -232,3 +234,54 @@ int shm_unlink(const char *name)
     return -1;
 }
 
+int chmod(const char *path, __mode_t mode)
+{
+    return -1;
+}
+
+
+int chown(const char *path, __uid_t uid, __gid_t gid)
+{
+    return -1;
+}
+
+int utimes(const char *filename, const struct timeval times[2])
+{
+    return -1;
+}
+
+int symlink(const char *oldpath, const char *newpath)
+{
+    return -1;
+}
+
+int truncate(const char *path, __off_t length)
+{
+    return -1;
+}
+
+int ftruncate(int fd, __off_t length)
+{
+    return -1;
+}
+
+int rename(const char *oldpath, const char *newpath)
+{
+    return -1;
+}
+
+int mkdir(const char *pathname, __mode_t mode)
+{
+    return -1;
+}
+
+int rmdir(const char *pathname)
+{
+    return -1;
+}
+
+
+int statfs(const char *path, struct statfs *buf)
+{
+    return -1;
+}
