@@ -51,7 +51,7 @@ CFLAGS_c += -I$(srcdir)/include/$(target_arch)
 CFLAGS_c += -I$(srcdir)/include/$(target_os)
 CFLAGS_c += -I$(srcdir)/include/$(target_arch)-$(target_os)
 
-LFLAGS_c += -lgcc
+LFLAGS_c += -lgcc -nostdlib
 
 ifeq ($(NOSCALL),y)
 CFLAGS_c += -D__NO_SCALL

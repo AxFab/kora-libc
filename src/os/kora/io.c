@@ -51,7 +51,8 @@ int write(int fd, const void *buf, size_t lg)
 
 int lseek(int fd, __off_t offset, unsigned int origin)
 {
-    return syscall(SYS_SEEK, fd, offset, origin);
+    // return syscall(SYS_SEEK, fd, offset, origin);
+    return syscall(SYS_SEEK, fd, offset & 0xffffffff, (offset >> 32) & 0xffffffff, origin);
 }
 
 int fcntl(int fd, int cmd, ...)

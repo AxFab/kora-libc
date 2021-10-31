@@ -21,7 +21,7 @@ extern __libc_init, __libc_fini, main, exit
 extern _GLOBAL_OFFSET_TABLE_
 
 %macro  get_GOT 0
-
+        push    ebx
         call    %%getgot
   %%getgot:
         pop     ebx
@@ -29,11 +29,16 @@ extern _GLOBAL_OFFSET_TABLE_
 
 %endmacro
 
+%macro PI_CALL 1
+    get_GOT
+    mov eax,[ebx + %1 wrt ..got]
+    call eax
+%endmacro
+
 
 _start:
     mov ebp, esp
     and esp, ~0xF
-    sub esp, 0x4
 
     get_GOT
     mov eax,[ebx + __libc_init wrt ..got]

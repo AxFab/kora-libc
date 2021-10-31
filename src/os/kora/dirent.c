@@ -73,6 +73,28 @@ int closedir(DIR *dir)
     return ret;
 }
 
+int readdir_r(DIR *dir, struct dirent *entry, struct dirent **restrict result)
+{
+    if (dir->pos >= dir->len) {
+        int len = syscall(SYS_READDIR, dir->fd, dir->buf, DIRSTREAM_BUF_SIZE);
+        if (len < 0)
+            return 0;
+        dir->pos = 0;
+        dir->len = len;
+    }
+    if (dir->len == 0) {
+        if (result)
+            *result = NULL;
+        return NULL;
+    }
+    memcpy(entry, (void *)(dir->buf + dir->pos), sizeof(struct dirent));
+    dir->pos += entry->d_reclen;
+    dir->cur = entry->d_off;
+    if (result)
+        *result = entry;
+    return entry;
+}
+
 struct dirent *readdir(DIR *dir)
 {
     struct dirent *entry;
