@@ -41,7 +41,7 @@ index f04a993f..282e2cc5 100644
      targ_selvecs="i386_elf32_vec iamcu_elf32_vec x86_64_elf32_vec l1om_elf64_vec k1om_elf64_vec"
      want64=true
      ;;
-+  x86_64-*-kora-*)
++  x86_64-*-kora*)
 +    targ_defvec=x86_64_elf64_vec
 +    targ_selvecs=i386_elf32_vec
 +    want64=true
