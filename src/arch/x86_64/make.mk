@@ -15,7 +15,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-$(outdir)/%.o: $(srcdir)/%.asm
+$(outdir)/%.o: $(topdir)/%.asm
 	$(S) mkdir -p $(dir $@)
 	$(Q) echo "    ASM $<"
 	$(V) nasm -f elf64 -o $@ $<
@@ -27,5 +27,5 @@ $(libdir)/crt0.o: $(srcdir)/os/${target_os}/${target_arch}/crts/crt0.asm
 
 ASM_EXT := asm
 
-SRCS += $(wildcard $(srcdir)/arch/x86_64/*.asm)
-SRCS += $(wildcard $(srcdir)/arch/i386/*.c)
+SRCS_c += $(wildcard $(srcdir)/arch/x86_64/*.asm)
+SRCS_c += $(wildcard $(srcdir)/arch/i386/*.c)

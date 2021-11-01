@@ -216,7 +216,7 @@ uint32_t ntohl(uint32_t netlong);
 uint16_t ntohs(uint16_t netshort);
 
 
-typedef enum {
+enum {
     NPROTO_TCP           = 1, // Ipv4 TCP
     NPROTO_UDP           = 2, // Ipv4 UDP
 };

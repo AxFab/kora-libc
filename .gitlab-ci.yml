@@ -5,7 +5,7 @@ build:
   stage: build
   script:
     - make clean
-    - make NOSCALL=y
+    - make
   artifacts:
     paths:
       - lib/libc.so
@@ -14,7 +14,7 @@ test:
   stage: test
   script:
     - make clean
-    - make check NOSCALL=y
+    - make check
     # - make coverage NOSCALL=y GCOV=y
   coverage: /(\d+(\.\d+)?)% \(\d+ of \d+ lines\)/
 
