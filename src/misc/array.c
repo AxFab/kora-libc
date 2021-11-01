@@ -65,12 +65,9 @@ void qsort(void *base, size_t nmemb, size_t size, int (*compar)(const void *, co
 /* Binary search of a sorted array */
 void *bsearch(const void *key, const void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *))
 {
-
-    void *ptr;
-    int sign;
     while (nmemb > 0) {
-        ptr = (char *)base + size * (nmemb / 2);
-        sign = compar(key, ptr);
+        void *ptr = (char *)base + size * (nmemb / 2);
+        int sign = compar(key, ptr);
         if (sign < 0)
             nmemb /= 2;
         else if (sign > 0) {

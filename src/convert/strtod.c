@@ -40,94 +40,6 @@ long double __scaldcl(long double x, int n);
 
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-// static
-long double __scan_float_(FILE *fp, int base, int bits, int emin, int sign, int pok)
-{
-    int c = fgetc_unlocked(fp);
-    while (c == '0')
-        c = fgetc_unlocked(fp);
-
-    bool hex = base == 16;
-    bool got_radix = false;
-    bool got_digit = false;
-    bool got_tail = false;
-    int radix = '.';
-    uint64_t mantisse = 0;
-    long exp = 0;
-    int digits = 0;
-    long double y = 0;
-    long double sc = 1;
-
-    // Read digits
-    if (c == radix) {
-        got_radix = true;
-        for (; c == '0'; c = fgetc_unlocked(fp), exp--)
-            got_digit = true;
-    }
-
-    for (; ((unsigned)(c - '0') < 10U) || ((unsigned)((c | 32) - 'a') < 6U && hex) || c == radix; c = fgetc_unlocked(fp)) {
-        if (c == radix) {
-            if (got_radix)
-                break;
-            exp = digits;
-            got_radix = true;
-            continue;
-        }
-
-        got_digit = true;
-        int d = c > '9' ? ((c | 32) + 10 - 'a') : c - '0';
-        if (digits < _MANT_LG)
-            mantisse = mantisse * base + d;
-        else if (digits < LDBL_MANT_DIG / 4 + 1) {
-            sc /= base;
-            y += d * sc;
-        } else if (d && !got_tail) {
-            y += 0.5 * sc;
-            got_tail = true;
-        }
-        digits++;
-    }
-
-    // If no digits
-    if (!got_digit) {
-        // REWIND
-        return sign * 0.0;
-    }
-
-    // Fix exponent
-    if (!got_radix)
-        exp = digits;
-    while (digits < _MANT_LG) {
-        mantisse *= 16;
-        digits++;
-    }
-    exp *= 4;
-
-
-    // if ((c|32)=='p') {
-    //     e2 = scanexp(f, pok);
-    //     if (e2 == LLONG_MIN) {
-    //         if (pok) {
-    //             shunget(f);
-    //         } else {
-    //             shlim(f, 0);
-    //             return 0;
-    //         }
-    //         e2 = 0;
-    //     }
-    // } else {
-    //     shunget(f);
-    // }
-
-    // Check 'P'
-    ungetc_unlocked(c, fp);
-    if (!mantisse)
-        return sign * 0.0;
-
-    // return __scalbnl(y, exp);
-    return -1;
-}
-
 static long double __scan_hex_float(FILE *fp, int bits, int emin, int sign, int pok)
 {
     int c = fgetc_unlocked(fp);
@@ -139,7 +51,7 @@ static long double __scan_hex_float(FILE *fp, int bits, int emin, int sign, int 
     bool got_tail = false;
     int radix = '.';
     uint64_t mantisse = 0;
-    long exp = 0;
+    long expn = 0;
     int digits = 0;
     long double y = 0;
     long double sc = 1;
@@ -148,7 +60,7 @@ static long double __scan_hex_float(FILE *fp, int bits, int emin, int sign, int 
     // Read digits
     if (c == radix) {
         got_radix = true;
-        for (c = fgetc_unlocked(fp); c == '0'; c = fgetc_unlocked(fp), exp -= 4)
+        for (c = fgetc_unlocked(fp); c == '0'; c = fgetc_unlocked(fp), expn -= 4)
             got_digit = true;
     }
 
@@ -156,7 +68,7 @@ static long double __scan_hex_float(FILE *fp, int bits, int emin, int sign, int 
         if (c == radix) {
             if (got_radix)
                 break;
-            exp = digits * 4;
+            expn = digits * 4;
             got_radix = true;
             continue;
         }
@@ -183,7 +95,7 @@ static long double __scan_hex_float(FILE *fp, int bits, int emin, int sign, int 
 
     // Fix exponent
     if (!got_radix)
-        exp = digits * 4;
+        expn = digits * 4;
     while (digits < _MANT_LG) {
         mantisse *= 16;
         digits++;
@@ -212,12 +124,12 @@ static long double __scan_hex_float(FILE *fp, int bits, int emin, int sign, int 
 
 
     // Setup exponent and check range
-    exp -= _MANT_BITS;
-    if (exp > -emin) {
+    expn -= _MANT_BITS;
+    if (expn > -emin) {
         errno = ERANGE;
         return sign * LDBL_MAX * LDBL_MAX;
     }
-    if (exp < emin - 2 * LDBL_MANT_DIG) {
+    if (expn < emin - 2 * LDBL_MANT_DIG) {
         errno = ERANGE;
         return sign * LDBL_MIN * LDBL_MIN;
     }
@@ -229,10 +141,10 @@ static long double __scan_hex_float(FILE *fp, int bits, int emin, int sign, int 
             mantisse += mantisse;
             y += y;
         }
-        exp--;
+        expn--;
     }
-    if (bits > _MANT_BITS + exp - emin)
-        bits = MAX(_MANT_BITS + exp - emin, 0);
+    if (bits > _MANT_BITS + expn - emin)
+        bits = MAX(_MANT_BITS + expn - emin, 0);
 
 
     // Compute value
@@ -248,7 +160,7 @@ static long double __scan_hex_float(FILE *fp, int bits, int emin, int sign, int 
 
     if (!y)
         errno = ERANGE;
-    return __scalbnl(y, exp);
+    return __scalbnl(y, expn);
 }
 
 static long double __scan_dec_float(FILE *fp, int bits, int emin, int sign, int pok)

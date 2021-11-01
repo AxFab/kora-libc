@@ -89,7 +89,7 @@ static int __iswtype(wint_t wc, int flags)
             continue;
         if (wc < unicode_table[i].unicode_base)
             break;
-        return unicode_table[i].flags & flags ? 1 : 0;
+        return (unicode_table[i].flags & flags) ? 1 : 0;
     }
     return 0;
 }

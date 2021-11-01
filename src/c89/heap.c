@@ -142,7 +142,7 @@ void *_PRT(calloc)(size_t nmemb, size_t size)
 /* Re-allocate a block memory */
 void *_PRT(realloc)(void *ptr, size_t size)
 {
-    size_t lg = 0; /* Get chunk size */
+    size_t lg = ((unsigned int*)ptr)[-2]; /* Get chunk size */
     void *buf;
     if (lg > size)
         return ptr;

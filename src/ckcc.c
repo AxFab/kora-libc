@@ -28,10 +28,10 @@ int main()
     int j = sizeof(size_t);
     int p = sizeof(void *);
     printf("Page size: %d\n", (int)sysconf(_SC_PAGESIZE));
-    printf("Size int: %d\n", sizeof(int));
-    printf("Size long: %d\n", sizeof(long));
-    printf("Size size_t: %d\n", sizeof(size_t));
-    printf("Size void*: %d\n", sizeof(void *));
+    printf("Size int: %d\n", (int)sizeof(int));
+    printf("Size long: %d\n", (int)sizeof(long));
+    printf("Size size_t: %d\n", (int)sizeof(size_t));
+    printf("Size void*: %d\n", (int)sizeof(void *));
     if (sizeof(char) != 1)
         printf("Warning: char size is not size of byte!\n");
     if (j != p)

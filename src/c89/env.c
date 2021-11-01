@@ -42,7 +42,7 @@ void __env_rm_add(char *old, char *new)
     char **t = realloc(env_alloced, sizeof * t * (env_alloced_n + 1));
     if (!t)
         return;
-    (env_alloced = t)[env_alloced_n++] = new;
+    t[env_alloced_n++] = new;
 }
 
 int __putenv(char *s, size_t l, char *r)

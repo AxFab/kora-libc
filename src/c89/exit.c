@@ -39,9 +39,8 @@ static atomic_int __abort_lock = 0;
 
 static void __run_funcs(struct func_list *head, atomic_int *lock)
 {
-    void (*func)(void);
     while (head->count-- > 0) {
-        func = head->fs[head->count];
+        void (*func)(void) = head->fs[head->count];
         __unlock(lock);
         func();
         __lock(lock);

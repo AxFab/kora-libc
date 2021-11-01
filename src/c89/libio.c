@@ -202,11 +202,9 @@ int fflush_unlocked(FILE *fp)
 /* Flush a fp */
 int _PRT(fflush)(FILE *fp)
 {
-    int ret;
-
     if (fp) {
         FLOCK(fp);
-        ret = fflush_unlocked(fp);
+        int ret = fflush_unlocked(fp);
         FUNLOCK(fp);
         return ret;
     }

@@ -80,10 +80,10 @@ int mtx_timedlock(mtx_t *restrict mutex, const struct timespec *restrict time_po
 /* locks a mutex or returns without blocking if already locked */
 int mtx_trylock(mtx_t *mutex)
 {
-    int i, s;
+    int i;
     /* spin and try to take lock */
     for (i = 0; i < 100; i++) {
-        s = atomic_cmpxchg(&mutex->value, 0, 1);
+        int s = atomic_cmpxchg(&mutex->value, 0, 1);
         if (s)
             return 0;
         atomic_break();
