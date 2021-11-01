@@ -30,6 +30,7 @@
 #define END_TEST() }
 
 #define ck_ok(n)  ck_ok_(n, #n, __FILE__, __LINE__)
+#define ck_abort(n)  ck_abort_(__FILE__, __LINE__)
 #define ck_test_case(s, f)  ck_test_case_(s, f, #f);
 
 typedef struct ck_suite Suite;
@@ -46,6 +47,7 @@ struct ck_suite {
     struct ck_test *cursor;
     jmp_buf jmpbuf;
     int fails;
+    int errs;
     int success;
     int cases;
 };
@@ -60,11 +62,17 @@ static inline void ck_ok_(bool assert, const char *expr, const char *file, int l
     }
 }
 
+static inline void ck_abort_(const char *file, int line)
+{
+    fprintf(stderr, "Abort test at %s:%d\n", file, line);
+    longjmp(__ck_suite->jmpbuf, 2);
+}
+
 static inline void ck_test_case_(Suite *s, void (*func)(int), const char *name)
 {
     struct ck_test *ts = malloc(sizeof(struct ck_test));
     ts->func = func;
-    ts->next = s->tail;
+    ts->next = NULL;
     ts->name = name;
     s->count++;
     if (s->tail) {
@@ -83,7 +91,7 @@ static inline int ck_run(Suite *s)
     s->success = 0;
     s->cases = 0;
     s->cursor = s->head;
-    fprintf(stderr, "Start unit-tests process: \e[33m%d\e[0m tests\n", s->count);
+    fprintf(stderr, "Start unit-tests process: \033[33m%d\033[0m tests\n", s->count);
     for (int i = 0; s->cursor; ++i) {
         struct ck_test *ts = s->cursor;
         s->cursor = ts->next;
@@ -91,11 +99,14 @@ static inline int ck_run(Suite *s)
         if (r == 0) {
             s->cases++;
             ts->func(i);
-            fprintf(stderr, "  - Test %-32s  [ \e[32mOK\e[0m ]\n", ts->name);
+            fprintf(stderr, "  - Test %-32s  [ \033[32mOK\033[0m ]\n", ts->name);
             s->success++;
-        } else {
-            fprintf(stderr, "  - Test %-32s  [\e[31mFAILS\e[0m]\n", ts->name);
+        } else if (r == 1) {
+            fprintf(stderr, "  - Test %-32s  [\033[31mFAILS\033[0m]\n", ts->name);
             s->fails++;
+        } else if (r == 2) {
+            fprintf(stderr, "  - Test %-32s  [\033[33mERR.\033[0m]\n", ts->name);
+            s->errs++;
         }
         free(ts);
     }

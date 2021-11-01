@@ -17,40 +17,25 @@
  *
  *   - - - - - - - - - - - - - - -
  */
-#ifndef _SYS_MMAN_H
-#define _SYS_MMAN_H 1
+#ifndef __BITS_SYSCALL_H
+#define __BITS_SYSCALL_H 1
+
+#if !defined __SYS_SYSCALL_H
+# error "Never use <bits/syscall.h> directly; include <sys/syscall.h> instead."
+#endif
+
 
 #include <bits/types.h>
-#include <bits/mman.h>
-
-__STDC_GUARD
-
-#define MAP_FAILED ((void *) -1)
-
-void *mmap(void *addr, size_t length, int prot, int flags, int fd, __off_t off);
-int munmap(void *addr, size_t length);
-
-int mprotect(void *addr, size_t length, int prot);
-int msync(void *addr, size_t length, int flags);
-
-int mlock(const void *addr, size_t length);
-int munlock(const void *addr, size_t length);
-int mlockall(int);
-int munlockall(void);
-
-#if defined(__GNU) || defined(__BSD)
-int madvise(void *, size_t, int);
-int mincore(void *, size_t, unsigned char *);
-#endif
-
-int shm_open(const char *name, int oflag, __mode_t mode);
-int shm_unlink(const char *name);
+#include <stdint.h>
 
 
-#ifdef __LARGEFILE64
-# define mmap64 mmap
-#endif
+struct dirent {
+    int d_ino;
+    int d_off;
+    unsigned short int d_reclen;
+    unsigned char d_type;
+    char d_name[256];
+};
 
-__STDC_END
 
-#endif  /* _SYS_MMAN_H */
+#endif  /* __BITS_SYSCALL_H */

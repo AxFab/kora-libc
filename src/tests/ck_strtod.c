@@ -44,19 +44,25 @@ START_TEST(test_strtod)
     double d4  = strtod("0000.08a", &str);
     ck_ok(d4 == 0.08);
     ck_ok(strcmp(str, "a") == 0);
+}
+END_TEST()
 
-    // double d5  = strtod("0x34p45!", &str);
-    // ck_ok(d5 == 0x34p45);
-    // ck_ok(strcmp(str, "!") == 0);
+START_TEST(test_strtod_exp)
+{
+    char* str;
 
-    // double d6  = strtod("12e3 \n", &str);
-    // ck_ok(d6 == 12e3);
-    // ck_ok(strcmp(str, " \n") == 0);
+    double d5 = strtod("0x34p45!", &str);
+    ck_ok(d5 == 0x34p45);
+    ck_ok(strcmp(str, "!") == 0);
 
+    double d6 = strtod("12e3 \n", &str);
+    ck_ok(d6 == 12e3);
+    ck_ok(strcmp(str, " \n") == 0);
 }
 END_TEST()
 
 void ck_strtod(Suite *s)
 {
     ck_test_case(s, test_strtod);
+    // ck_test_case(s, test_strtod_exp);
 }

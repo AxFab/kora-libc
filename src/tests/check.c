@@ -18,21 +18,25 @@
  *   - - - - - - - - - - - - - - -
  */
 #include "check.h"
+#include <time.h>
+#include <bits/xtime.h>
 
 Suite *__ck_suite = NULL;
 
 void ck_strtod(Suite *s);
+void ck_heap(Suite *s);
 
 void futex_wait() {}
 void futex_wake() {}
 void futex_requeue() {}
-void pspawn() {}
-void xtime_read() {}
+xtime_t xtime_read(int clockid) { time(NULL) * 1000000ULL; }
+// void pspawn() {}
 
 int main(int argc, char const *argv[])
 {
     Suite s;
     memset(&s, 0, sizeof(s));
     ck_strtod(&s);
+    ck_heap(&s);
     return ck_run(&s) ? -1 : 0;
 }

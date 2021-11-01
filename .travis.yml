@@ -1,0 +1,15 @@
+# CI script for KoraOS on Travis
+# -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+language: c
+
+
+jobs:
+  include:
+    - stage: build
+      script:
+      - make clean
+      - make
+    - stage: test
+      script:
+      - make clean
+      - make check

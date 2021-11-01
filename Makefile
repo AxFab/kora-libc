@@ -30,7 +30,6 @@ install: $(prefix)/lib/libc.so $(prefix)/lib/crt0.o install-headers
 # 	$(V) cp -r $(topdir)/arch/$(target_arch)/include $(prefix)/include/$(target_arch)-$(target_os)
 
 include $(topdir)/make/build.mk
-include $(topdir)/make/check.mk
 
 CFLAGS ?= -Wall -Wextra -Wno-unused-parameter -ggdb
 
@@ -38,7 +37,7 @@ SRCS_c += $(wildcard $(srcdir)/c89/*.c)
 SRCS_c += $(wildcard $(srcdir)/convert/*.c)
 SRCS_c += $(wildcard $(srcdir)/libio/*.c)
 SRCS_c += $(wildcard $(srcdir)/misc/*.c)
-SRCS_c += $(wildcard $(srcdir)/posix/*.c)
+# SRCS_c += $(wildcard $(srcdir)/posix/*.c)
 SRCS_c += $(wildcard $(srcdir)/string/*.c)
 SRCS_c += $(wildcard $(srcdir)/synchro/*.c)
 SRCS_c += $(wildcard $(srcdir)/xopen/*.c)
@@ -62,21 +61,36 @@ SRCS_c += $(wildcard $(srcdir)/os/$(target_os)/*.c)
 SRCS_c += $(wildcard $(srcdir)/os/$(target_os)/$(target_arch)/*.$(ASM_EXT))
 endif
 
-ifeq ($(GCOV),y)
-CFLAGS_c += -fprofile-arcs -ftest-coverage
-LFLAGS_c += -coverage
-endif
-
 $(gendir)/lib/libc.a:
 	$(V) ar -rc $@ $(call fn_objs,SRCS_c,c)
 
-SRCS_ck += ${SRCS_c}
+
+# SRCS_ck += $(wildcard $(srcdir)/c89/*.c)
+SRCS_ck += $(srcdir)/c89/arena.c
+SRCS_ck += $(srcdir)/c89/libio.c
+SRCS_ck += $(srcdir)/c89/locale.c
+SRCS_ck += $(wildcard $(srcdir)/convert/*.c)
+SRCS_ck += $(wildcard $(srcdir)/libio/*.c)
+SRCS_ck += $(wildcard $(srcdir)/misc/*.c)
+# SRCS_ck += $(wildcard $(srcdir)/posix/*.c)
+SRCS_ck += $(wildcard $(srcdir)/string/*.c)
+SRCS_ck += $(wildcard $(srcdir)/synchro/*.c)
+SRCS_ck += $(wildcard $(srcdir)/xopen/*.c)
+# SRCS_ck += $(wildcard $(srcdir)/net/*.c)
 SRCS_ck += $(wildcard $(srcdir)/tests/*.c)
+
+CFLAGS_ck += ${CFLAGS_c} -D__NO_SCALL
+ifeq ($(GCOV),y)
+CFLAGS_ck += -fprofile-arcs -ftest-coverage
+LFLAGS_ck += -coverage
+endif
 
 
 $(eval $(call comp_source,c,CFLAGS_c))
 $(eval $(call link_shared,c,SRCS_c,LFLAGS_c,c))
-$(eval $(call link_bin,cklc,SRCS_ck,LFLAGS_c,c))
+
+$(eval $(call comp_source,ck,CFLAGS_ck))
+$(eval $(call link_bin,cklc,SRCS_ck,LFLAGS_ck,ck))
 
 CHECKS += cklc
 
@@ -113,10 +127,9 @@ $(prefix)/include/%.h: $(topdir)/src/include/$(target_arch)/%.h
 	$(V) cp -vrP $< $@
 
 
-
-check: $(patsubst %,val_%,$(CHECKS))
+include $(topdir)/make/check.mk
 
 ifeq ($(NODEPS),)
 -include $(call fn_deps,SRCS_c,c)
--include $(call fn_deps,SRCS_ck,c)
+-include $(call fn_deps,SRCS_ck,ck)
 endif
