@@ -3,6 +3,9 @@
 
 build:
   stage: build
+  before_script:
+    - apt-get update
+    - apt-get install -y nasm
   script:
     - make clean
     - make
@@ -12,6 +15,9 @@ build:
 
 test:
   stage: test
+  before_script:
+    - apt-get update
+    - apt-get install -y nasm
   script:
     - make clean
     - make check
