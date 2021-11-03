@@ -175,7 +175,10 @@ struct sockaddr_in {
 // #define AF_IRDA         26              // IrDA
 // #define AF_NETDES       28              // Network Designers OSI & gateway
 
-
+struct iovec {
+    char *buf;
+    size_t len;
+};
 
 struct msghdr {
     void *msg_name; /* Optional address */
