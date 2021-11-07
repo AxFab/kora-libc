@@ -21,11 +21,6 @@
 #define __FCNTL_H 1
 
 #include <bits/cdefs.h>
-#if !defined __UNIX && !defined __POSIX
-#error "The header <fcntl.h> requires unix or posix support."
-#endif
-
-
 #include <bits/stat.h>
 #include <bits/fcntl.h>
 #include <bits/libio.h>

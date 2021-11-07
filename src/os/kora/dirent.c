@@ -20,6 +20,7 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <malloc.h>
+#include <string.h>
 #include <sys/syscall.h>
 
 int close(int fd);
@@ -85,14 +86,14 @@ int readdir_r(DIR *dir, struct dirent *entry, struct dirent **restrict result)
     if (dir->len == 0) {
         if (result)
             *result = NULL;
-        return NULL;
+        return -1;
     }
     memcpy(entry, (void *)(dir->buf + dir->pos), sizeof(struct dirent));
     dir->pos += entry->d_reclen;
     dir->cur = entry->d_off;
     if (result)
         *result = entry;
-    return entry;
+    return 0;
 }
 
 struct dirent *readdir(DIR *dir)

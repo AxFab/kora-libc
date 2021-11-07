@@ -210,9 +210,9 @@ function HELP {
     cat << EOF
 Usage: ${SCRIPT_NAME} [OPTIONS]
 with options:
-    --srcdir=SRCDIR     Change the directory to put sources
-    --gendir=GENDIR     Change the building directory
-    --prefix=PREFIX     Change the installation directory
+    --srcdir=SRCDIR     Change the directory to put sources (default \$pwd/sources)
+    --gendir=GENDIR     Change the building directory (default \$pwd/build-\$TARGET)
+    --prefix=PREFIX     Change the installation directory (default \$pwd/tools-\$TARGET)
     --target=TARGET     Triplet of the destination platform
     --wgetflags=FLAGS   Setup some flags for 'wget' tool
     --makethrds=FLAGS   Setup the number of threads for 'make' tool
