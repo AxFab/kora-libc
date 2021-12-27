@@ -227,7 +227,7 @@ int _PRT(fclose)(FILE *fp)
 
     assert(fp->write == _fwrite && fp->read == _fread);
 
-    FLOCK(fp);
+    // FLOCK(fp);
     perm = fp->flags_ & F_PERM;
     if (!perm) {
         /* TODO struct _IO_FILE_ are linked, remove fom the list! */
@@ -422,10 +422,14 @@ int _PRT(fseek)(FILE *fp, long offset, int whence)
     ret = fp->seek(fp, offset, whence);
     if (ret >= 0) {
         fp->fpos_ = ret;
-        if (fp->rbf_.base_)
+        if (fp->rbf_.base_) {
             free(fp->rbf_.base_);
-        if (fp->wbf_.base_)
+            fp->rbf_.base_ = NULL;
+        }
+        if (fp->wbf_.base_) {
             free(fp->wbf_.base_);
+            fp->wbf_.base_ = NULL;
+        }
     }
     FUNLOCK(fp);
     return ret;

@@ -19,7 +19,14 @@
  */
 #include "check.h"
 #include <time.h>
-#include <bits/xtime.h>
+
+enum
+{
+    XTIME_CLOCK,
+    XTIME_CPUTIME,
+};
+
+typedef long long xtime_t;
 
 Suite *__ck_suite = NULL;
 
@@ -31,6 +38,31 @@ void futex_wake() {}
 void futex_requeue() {}
 xtime_t xtime_read(int clockid) { time(NULL) * 1000000ULL; }
 // void pspawn() {}
+
+int __irq_semaphore = 0;
+void irq_reset(bool enable)
+{
+    __irq_semaphore = 0;
+}
+
+bool irq_enable()
+{
+    // assert(__irq_semaphore > 0);
+    --__irq_semaphore;
+    return __irq_semaphore == 0;
+}
+
+void irq_disable()
+{
+    ++__irq_semaphore;
+}
+
+bool irq_ready()
+{
+    return __irq_semaphore == 0;
+}
+
+
 
 int main(int argc, char const *argv[])
 {

@@ -21,6 +21,9 @@
 #include <string.h>
 #include "allocator.h"
 #include <errno.h>
+#include <stdio.h>
+
+void alloc_dump(heap_arena_t *arena);
 
 #define POISON_PTR 0xAAAAAAAA
 
@@ -33,7 +36,7 @@ struct heap_chunk {
     unsigned int prsz_: 31;
     unsigned int isfree_: 1;
     union {
-        char data_[8];
+        char data_[2*sizeof(void*)];
         struct {
             heap_chunk_t *prev_;
             heap_chunk_t *next_;
@@ -127,6 +130,35 @@ static heap_chunk_t *arena_collapse(heap_arena_t *arena, heap_chunk_t *c1,
 static int arena_check(heap_arena_t *arena)
 {
     assert(splock_locked(&arena->lock_));
+    heap_chunk_t *prev = NULL;
+    heap_chunk_t *next = NULL;
+    heap_chunk_t *chunk = (heap_chunk_t *)arena->address_;
+    void *limit = ADDR_OFF(arena->address_, arena->length_);
+    while (chunk < limit) {
+        if (prev != NULL && prev != arena_prev_chunk(chunk))
+            return -1;
+        // Check size
+        if (chunk->size_ & (HEAP_ALIGN -1) || chunk->size_ > arena->length_)
+            return -1;
+        if (chunk->prsz_ & (HEAP_ALIGN -1) || chunk->prsz_ > arena->length_)
+            return -1;
+        if (chunk->isfree_ == 0 && chunk->size_ > arena->max_chunk)
+            return -1;
+        next = arena_next_chunk(chunk);
+        if (next > limit)
+            return -1;
+
+        if (chunk->isfree_) {
+            if (chunk->g_.f_.prev_ != NULL && chunk->g_.f_.prev_ < arena->address_ && chunk->g_.f_.prev_ >= limit)
+                return -1;
+            if (chunk->g_.f_.next_ != NULL && chunk->g_.f_.next_ < arena->address_ && chunk->g_.f_.next_ >= limit)
+                return -1;
+            // Check we are on free list
+        }
+
+        prev = chunk;
+        chunk = next;
+    }
     return 0;
 }
 
@@ -138,7 +170,7 @@ void setup_arena(heap_arena_t *arena, size_t address, size_t length,
     memset(arena, 0, sizeof(heap_arena_t));
     arena->address_ = address;
     arena->length_ = length;
-    arena->flags_ = (option & HEAP_OPTIONS) | HEAP_ARENA;
+    arena->flags_ = (option & HEAP_OPTIONS) | HEAP_ARENA | HEAP_PARANO;
     arena->max_chunk = max;
     first->size_ = length;
     first->prsz_ = 0;
@@ -150,6 +182,7 @@ void setup_arena(heap_arena_t *arena, size_t address, size_t length,
     arena->used_ = 0;
 }
 
+int nb = 0;
 /* Allocate a block of memory into an arena */
 void *malloc_r(heap_arena_t *arena, size_t len)
 {
@@ -167,7 +200,11 @@ void *malloc_r(heap_arena_t *arena, size_t len)
     splock_lock(&arena->lock_);
     if (arena->flags_ & HEAP_PARANO && arena_check(arena)) {
         splock_unlock(&arena->lock_);
-        errno = -1;
+        errno = 0;
+        perror("Heap corrupted");
+        alloc_dump(arena);
+        arena_check(arena);
+        abort();
         return NULL;
     }
 
@@ -199,12 +236,18 @@ void *malloc_r(heap_arena_t *arena, size_t len)
         }
 
         if (arena->flags_ & HEAP_PARANO && arena_check(arena)) {
+            alloc_dump(arena);
             splock_unlock(&arena->lock_);
-            errno = -1;
+            errno = 0;
+            perror("Heap corrupted");
+            alloc_dump(arena);
+            arena_check(arena);
+            abort();
             return NULL;
         }
 
         splock_unlock(&arena->lock_);
+
         errno = 0;
         return cur->g_.data_;
     }
@@ -256,9 +299,42 @@ void free_r(heap_arena_t *arena, void *ptr)
     }
 
     arena_freelist_add(arena, chunk);
-    if (arena->flags_ & HEAP_PARANO)
+    if (arena->flags_ & HEAP_PARANO && arena_check(arena)) {
+        splock_unlock(&arena->lock_);
+        errno = 0;
+        perror("Heap corrupted");
+        alloc_dump(arena);
         arena_check(arena);
+        abort();
+        return;
+    }
 
     splock_unlock(&arena->lock_);
     errno = 0;
+}
+
+
+void alloc_dump(heap_arena_t *arena)
+{
+    char tmp[40];
+    int len;
+
+    splock_lock(&arena->lock_);
+    heap_chunk_t *chunk = (heap_chunk_t *)arena->address_;
+    void *limit = ADDR_OFF(arena->address_, arena->length_);
+    printf("Arena %p\n", chunk);
+    while (chunk < limit) {
+        len = snprintf(tmp, 40, " - chunk %p %04x %c\n", chunk, chunk->size_, chunk->isfree_ ? '-' : 'o');
+        write(1, tmp, len);
+        chunk = arena_next_chunk(chunk);
+    }
+
+    chunk = arena->free_;
+    while (chunk) {
+        len = snprintf(tmp, 40, " - free %p %04x\n", chunk, chunk->size_);
+        write(1, tmp, len);
+        chunk = chunk->g_.f_.next_;
+    }
+
+    splock_unlock(&arena->lock_);
 }

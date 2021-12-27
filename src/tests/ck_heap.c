@@ -25,12 +25,9 @@
 
 START_TEST(test_alloc)
 {
-    void *base = mmap(NULL, 0x400000, PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
-    if (base == MAP_FAILED) {
-        fprintf(stderr, "Unable to map anonymous memory %d:%s\n", errno, strerror(errno));
-        ck_abort();
-    }
+    void *base = _valloc(0x400000);
     ck_ok(base != NULL);
+    memset(base, 0, 0x400000);
     void *limit = ((char*)base) + 0x400000;
     ck_ok(limit > base);
 
@@ -64,12 +61,9 @@ END_TEST()
 
 START_TEST(test_alloc_rep)
 {
-    void *base = mmap(NULL, 0x400000, PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
-    if (base == MAP_FAILED) {
-        fprintf(stderr, "Unable to map anonymous memory %d:%s\n", errno, strerror(errno));
-        ck_abort();
-    }
+    void *base = _valloc(0x400000);
     ck_ok(base != NULL);
+    memset(base, 0, 0x400000);
     void *limit = ((char*)base) + 0x400000;
     ck_ok(limit > base);
 

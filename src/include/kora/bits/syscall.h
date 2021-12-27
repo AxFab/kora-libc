@@ -58,6 +58,9 @@ enum syscall_no {
     SYS_FSTAT,
 
     SYS_XTIME,
+
+    SYS_MKFS,
+    SYS_MOUNT,
 };
 
 enum sys_vars {

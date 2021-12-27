@@ -69,6 +69,18 @@ static heap_arena_t *find_arena(size_t ptr)
     return NULL;
 }
 
+static void kill_arena(heap_arena_t *arena)
+{
+    ll_remove(&__arenas, &arena->node_);
+    _PRT(free)(arena);
+}
+
+static void add_arena(heap_arena_t *arena)
+{
+    ll_append(&__arenas, &arena->node_);
+}
+
+
 /* Dynamicaly allocate a page align memory block */
 void *_PRT(valloc)(size_t size)
 {
@@ -79,8 +91,7 @@ void *_PRT(valloc)(size_t size)
     arena->address_ = (size_t)map;
     arena->length_ = size;
     arena->flags_ = HEAP_MAPPED;
-    ll_append(&__arenas, &arena->node_);
-    /* TODO CREATE ARENA(HEAP_MAPPED) PUSH ON BBTREE */
+    add_arena(arena);
     return map;
 }
 
@@ -162,7 +173,7 @@ void _PRT(free)(void *ptr)
     if (arena->flags_ & HEAP_MAPPED) {
         assert((size_t)ptr == arena->address_);
         unmap((void *)arena->address_, arena->length_);
-        /* Remove from bbtree and free */
+        kill_arena(arena);
         // } else if ((size_t)ptr >= arena->address_ && (size_t)ptr < arena->address_ + arena->length_) {
     } else {
         free_r(arena, ptr);

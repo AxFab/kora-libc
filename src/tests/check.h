@@ -26,6 +26,15 @@
 #include <setjmp.h>
 #include <string.h>
 
+#if !defined(_WIN32)
+# define _valloc(s)  valloc(s)
+# define _vfree(p)  free(p)
+#else
+# include <windows.h>
+# define _valloc(s)  _aligned_malloc(s, PAGE_SIZE)
+# define _vfree(p)  _aligned_free(p)
+#endif
+
 #define START_TEST(n) void n(int __n) {
 #define END_TEST() }
 

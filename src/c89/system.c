@@ -67,7 +67,7 @@ int system(const char *cmd)
 void perror(const char *msg)
 {
     FILE *fp = stderr;
-    char *errstr = strerror(errno);
+    char *errstr = errno != 0 ? strerror(errno) : NULL;
 
     FLOCK(fp);
     // void *locale = fp->locale;
@@ -77,7 +77,8 @@ void perror(const char *msg)
         fwrite_unlocked(msg, strlen(msg), 1, fp);
         fwrite_unlocked(": ", 2, 1, fp);
     }
-    fwrite_unlocked(errstr, strlen(errstr), 1, fp);
+    if (errstr)
+        fwrite_unlocked(errstr, strlen(errstr), 1, fp);
     fwrite_unlocked("\n", 1, 1, fp);
 
     // fp->mode = mode;
